@@ -22,7 +22,7 @@ after(async () => {
 })
 
 describe('todo-route', function() {
-  describe.skip('test GET /api/todo', function() {
+  describe('test GET /api/todo', function() {
     before(async function() {
       await dropCollection(collectionName)
       await insertMany(collectionName, fourTodos)
@@ -39,7 +39,7 @@ describe('todo-route', function() {
     })
   })
 
-  describe.skip('test GET /api/todo/:id', function() {
+  describe('test GET /api/todo/:id', function() {
     let _idToGet = ''
     before(async function() {
       await dropCollection(collectionName)
@@ -60,7 +60,7 @@ describe('todo-route', function() {
     before(async function() {
       await dropCollection(collectionName)
     })
-    it.skip('should post 1 todo', async function() {
+    it('should post 1 todo', async function() {
       const post = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
@@ -77,40 +77,76 @@ describe('todo-route', function() {
       expect(findData[0].title).to.equal(oneTodo.title)
       expect(findData[0].completed).to.equal(false)
     })
+  })
 
-
-
-/////////////////////////////////////////////////////////
-
-    // const testVals = ['', 'a', {}]
-    const testVals = []
-
-    // if send 1 is evaluated as buffer (odd) and throws
-    testVals.forEach(val => {
-      it(`send it "${val}" `, async function() {
-        const post = await request(app)
-          .post('/api/todo')
-          .set('Accept', 'application/json')
-          .send(val)
-        yellow(`${val}`, post.body)
-      })  
-    })
+  describe('test validation for POST /api/todo', function() {
     it('send it nothing at all', async function() {
-      const post = await request(app)
+      const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send()
-      yellow('post.body', post.body)
+      expect(ret.body.error.errorCount).to.equal(1)
+      expect(ret.body.error.errors[0].inputError).to.equal(
+        'parameter obj is invalid type [object Object]'
+      )
     })
-    
-
-/////////////////////////////////////////////////////////////
-
-
-    
+    it('send "" ', async function() {
+      const ret = await request(app)
+        .post('/api/todo')
+        .set('Accept', 'application/json')
+        .send('')
+      expect(ret.body.error.errorCount).to.equal(1)
+      expect(ret.body.error.errors[0].inputError).to.equal(
+        'parameter obj is invalid type [object Object]'
+      )
+    })
+    it('send "a" ', async function() {
+      const ret = await request(app)
+        .post('/api/todo')
+        .set('Accept', 'application/json')
+        .send('a')
+      expect(ret.body.error.errorCount).to.equal(1)
+      expect(ret.body.error.errors[0].inputError).to.equal(
+        'parameter obj is invalid type [object Object]'
+      )
+    })
+    it('send {}', async function() {
+      const ret = await request(app)
+        .post('/api/todo')
+        .set('Accept', 'application/json')
+        .send({})
+      expect(ret.body.error.errorCount).to.equal(1)
+      expect(ret.body.error.errors[0].inputError).to.equal(
+        'parameter obj is invalid type [object Object]'
+      )
+    })
+    it('send too short title', async function() {
+      const ret = await request(app)
+        .post('/api/todo')
+        .set('Accept', 'application/json')
+        .send({ title: 'a' })
+      expect(ret.body.error.errors[0].title).to.equal(
+        'Incorrect length. Should be >= 3'
+      )
+    })
+    it('send title = 123', async function() {
+      const ret = await request(app)
+        .post('/api/todo')
+        .set('Accept', 'application/json')
+        .send({ title: 123 })
+      expect(ret.body.data.title).to.equal(123)
+    })
+    it('send title = "123" ', async function() {
+      const ret = await request(app)
+        .post('/api/todo')
+        .set('Accept', 'application/json')
+        .send({ title: '123' })
+      yellow('ret', ret.body)
+      expect(ret.body.data.title).to.equal('123')
+    })
   })
 
-  describe.skip('test DELETE /api/todo/:id', function() {
+  describe('test DELETE /api/todo/:id', function() {
     let _idToDelete = ''
     before(async function() {
       await dropCollection(collectionName)
@@ -130,7 +166,7 @@ describe('todo-route', function() {
     })
   })
 
-  describe.skip('test PATCH /api/todo/:id', function() {
+  describe('test PATCH /api/todo/:id', function() {
     const newData = { title: 'changed title', completed: true }
     let idToUpdate
     before(async function() {
@@ -149,7 +185,7 @@ describe('todo-route', function() {
     })
   })
 
-  describe.skip('unknown endpoint', function() {
+  describe('unknown endpoint', function() {
     it('should return 404 & unknown endpoint', async () => {
       const get = await request(app)
         .get('/api/unknown')

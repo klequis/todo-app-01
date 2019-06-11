@@ -7,26 +7,23 @@ import {
   findOneAndUpdate,
   objectIdFromHexString
 } from '../db'
-
 import validateType from 'validation'
-
-// import { hasProp } from 'lib'
-
 import { yellow } from 'logger'
+import { hasProp } from '../lib/hasProp';
 
 const router = express.Router()
 
-
 const todoType = {
   title: {
-    type: 'string',
-    minLength: 10
+    type: ['number', 'string'],
+    minLength: 3,
+    required: true,
   },
   completed: {
-    type: 'boolean'
+    type: ['boolean'],
+    required: false,
   }
 }
-
 
 /*
     - assumes only { title: string } is sent
@@ -36,16 +33,19 @@ router.post('/', async (req, res) => {
   try {
     const td1 = req.body
     const validation = validateType(td1, todoType)
-    yellow('validation', validation)
-    if (!validation) {
-      res.status(400).send({data: null, error: validation})
+    
+    if (validation.errorCount > 0) {
+      // yellow('validation', validation)
+      // yellow('RETURN ERROR')
+      res.status(400).send({ data: null, error: validation })
+    } else {
+      const td2 = {
+        title: td1.title,
+        completed: false
+      }
+      const inserted = await insertOne('todos', td2)
+      res.send(inserted)
     }
-    const td2 = {
-      title: td1.title,
-      completed: false
-    }
-    const inserted = await insertOne('todos', td2)
-    res.send(inserted)
   } catch (e) {
     console.error('error', e)
     res.status(400).send(e)

@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { mongoUri, dbName, apiRoot } from 'config'
 
-describe.skip('test config', function() {
+describe('test config', function() {
   const testLocal = 'testLocal'
   const dev = 'dev'
   // testLocal

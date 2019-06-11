@@ -17,7 +17,7 @@ after(async () => {
   await close()
 })
 
-describe.skip('dbFunctions', function() {
+describe('dbFunctions', function() {
   describe('test insertMany', function() {
     it('insertMany: should insert 4 todos', async function() {
       const i = await insertMany(collectionName, fourTodos)

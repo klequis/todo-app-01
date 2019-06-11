@@ -3,7 +3,7 @@ import { isValidHexIdString } from 'db/helpers'
 
 const validHexString = '5ce819935e539c343f141ece'
 
-describe.skip('db/helpers.js', function() {
+describe('db/helpers.js', function() {
   describe('test getObjectId', function() {
     it('valid hex id should return true', function() {
       expect(isValidHexIdString(validHexString)).to.equal(true)
