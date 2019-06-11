@@ -8,16 +8,38 @@ import {
   objectIdFromHexString
 } from '../db'
 
+import validateType from 'validation'
+
+// import { hasProp } from 'lib'
+
+import { yellow } from 'logger'
+
 const router = express.Router()
+
+
+const todoType = {
+  title: {
+    type: 'string',
+    minLength: 10
+  },
+  completed: {
+    type: 'boolean'
+  }
+}
+
 
 /*
     - assumes only { title: string } is sent
     - { completed: false } will be added to all new todos
  */
-
 router.post('/', async (req, res) => {
   try {
     const td1 = req.body
+    const validation = validateType(td1, todoType)
+    yellow('validation', validation)
+    if (!validation) {
+      res.status(400).send({data: null, error: validation})
+    }
     const td2 = {
       title: td1.title,
       completed: false

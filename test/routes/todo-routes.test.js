@@ -22,7 +22,7 @@ after(async () => {
 })
 
 describe('todo-route', function() {
-  describe('test GET /api/todo', function() {
+  describe.skip('test GET /api/todo', function() {
     before(async function() {
       await dropCollection(collectionName)
       await insertMany(collectionName, fourTodos)
@@ -39,7 +39,7 @@ describe('todo-route', function() {
     })
   })
 
-  describe('test GET /api/todo/:id', function() {
+  describe.skip('test GET /api/todo/:id', function() {
     let _idToGet = ''
     before(async function() {
       await dropCollection(collectionName)
@@ -53,7 +53,6 @@ describe('todo-route', function() {
         .set('Accept', 'application/json')
         .send()
       expect(get.body.data[0]._id.toString()).to.equal(_idToGet)
-      
     })
   })
 
@@ -61,7 +60,7 @@ describe('todo-route', function() {
     before(async function() {
       await dropCollection(collectionName)
     })
-    it('should post 1 todo', async function() {
+    it.skip('should post 1 todo', async function() {
       const post = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
@@ -78,9 +77,40 @@ describe('todo-route', function() {
       expect(findData[0].title).to.equal(oneTodo.title)
       expect(findData[0].completed).to.equal(false)
     })
+
+
+
+/////////////////////////////////////////////////////////
+
+    // const testVals = ['', 'a', {}]
+    const testVals = []
+
+    // if send 1 is evaluated as buffer (odd) and throws
+    testVals.forEach(val => {
+      it(`send it "${val}" `, async function() {
+        const post = await request(app)
+          .post('/api/todo')
+          .set('Accept', 'application/json')
+          .send(val)
+        yellow(`${val}`, post.body)
+      })  
+    })
+    it('send it nothing at all', async function() {
+      const post = await request(app)
+        .post('/api/todo')
+        .set('Accept', 'application/json')
+        .send()
+      yellow('post.body', post.body)
+    })
+    
+
+/////////////////////////////////////////////////////////////
+
+
+    
   })
 
-  describe('test DELETE /api/todo/:id', function() {
+  describe.skip('test DELETE /api/todo/:id', function() {
     let _idToDelete = ''
     before(async function() {
       await dropCollection(collectionName)
@@ -100,7 +130,7 @@ describe('todo-route', function() {
     })
   })
 
-  describe('test PATCH /api/todo/:id', function() {
+  describe.skip('test PATCH /api/todo/:id', function() {
     const newData = { title: 'changed title', completed: true }
     let idToUpdate
     before(async function() {
@@ -119,7 +149,7 @@ describe('todo-route', function() {
     })
   })
 
-  describe('unknown endpoint', function() {
+  describe.skip('unknown endpoint', function() {
     it('should return 404 & unknown endpoint', async () => {
       const get = await request(app)
         .get('/api/unknown')
