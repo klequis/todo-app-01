@@ -5,11 +5,9 @@ import {
   insertOne,
   findOneAndDelete,
   findOneAndUpdate,
-  objectIdFromHexString
 } from '../db'
 import validateType from 'validation'
 import { yellow } from 'logger'
-import { hasProp } from '../lib/hasProp';
 
 const router = express.Router()
 
@@ -25,6 +23,15 @@ const todoType = {
   }
 }
 
+const formatReturnSuccess = data => {
+  return { data: data, error: null }
+}
+
+const formatReturnError = (functionName, error) => {
+  logError(functionName, error)
+  return { data: null, error: error.message }
+}
+
 /*
     - assumes only { title: string } is sent
     - { completed: false } will be added to all new todos
@@ -35,8 +42,6 @@ router.post('/', async (req, res) => {
     const validation = validateType(td1, todoType)
     
     if (validation.errorCount > 0) {
-      // yellow('validation', validation)
-      // yellow('RETURN ERROR')
       res.status(400).send({ data: null, error: validation })
     } else {
       const td2 = {
@@ -72,8 +77,12 @@ router.get('/:id', async (req, res) => {
 })
 
 router.delete('/:id', async (req, res) => {
-  const id = req.params.id
   try {
+    const id = req.params.id
+    yellow('id', typeof id)
+    if (!isValidStringMongoId(id)) {
+      return 
+    }
     let todo = await findOneAndDelete('todos', id)
     if (!todo) {
       return res.status(404).send()
