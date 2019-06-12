@@ -17,7 +17,7 @@ after(async () => {
   await close()
 })
 
-describe('dbFunctions', function() {
+describe.only('dbFunctions', function() {
   describe('test insertMany', function() {
     it('insertMany: should insert 4 todos', async function() {
       const i = await insertMany(collectionName, fourTodos)
@@ -48,8 +48,8 @@ describe('dbFunctions', function() {
     const newData = { title: 'todo added' }
     it('insertOne: should insert new document', async function() {
       const i = await insertOne(collectionName, newData)
-      expect(i.data._id).to.be.not.null
-      expect(i.data.title).to.equal('todo added')
+      expect(i.data[0]._id).to.be.not.null
+      expect(i.data[0].title).to.equal('todo added')
     })
   })
 
@@ -88,7 +88,7 @@ describe('dbFunctions', function() {
     })
     it('findOneAndDelete: should delete 1 of 4 todos', async function() {
       const deleted = await findOneAndDelete(collectionName, idToDelete)
-      const idDeleted = deleted.data._id.toString()
+      const idDeleted = deleted.data[0]._id.toString()
       expect(idDeleted).to.equal(idToDelete)
     })
   })
@@ -107,9 +107,9 @@ describe('dbFunctions', function() {
         idToUpdate,
         newData
       )
-      expect(updated.data._id.toString()).to.equal(idToUpdate)
-      expect(updated.data.title).to.equal(newData.title)
-      expect(updated.data.completed).to.equal(newData.completed)
+      expect(updated.data[0]._id.toString()).to.equal(idToUpdate)
+      expect(updated.data[0].title).to.equal(newData.title)
+      expect(updated.data[0].completed).to.equal(newData.completed)
     })
   })
 })
