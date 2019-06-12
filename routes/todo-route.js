@@ -4,10 +4,11 @@ import {
   findById,
   insertOne,
   findOneAndDelete,
-  findOneAndUpdate,
+  findOneAndUpdate
 } from '../db'
 import validateType from 'validation'
-import { yellow } from 'logger'
+import { yellow, red } from 'logger'
+import { isValidMongoStringId } from 'lib'
 
 const router = express.Router()
 
@@ -15,22 +16,49 @@ const todoType = {
   title: {
     type: ['number', 'string'],
     minLength: 3,
-    required: true,
+    required: true
   },
   completed: {
     type: ['boolean'],
-    required: false,
+    required: false
   }
 }
 
 const formatReturnSuccess = data => {
+  yellow('formatReturnSuccess**')
   return { data: data, error: null }
 }
 
-const formatReturnError = (functionName, error) => {
-  logError(functionName, error)
+const formatReturnError = error => {
+  // yellow('msg', error.message)
+  const msg = error.message
+
   return { data: null, error: error.message }
 }
+
+//////////////////////////////////////////////////////
+
+router.delete('/:id', async (req, res) => {
+  const id = req.params.id
+  yellow('typeof id', id)
+  try {
+    
+    if (!isValidMongoStringId(id)) {
+      const err = formatReturnError(new Error(`Error: ${id} is not a valid MongoDB _id`))
+      res.status(400).send(err)
+    }
+    
+    let todo = await findOneAndDelete('todos', id)
+    if (!todo) {
+      return res.status(400).send()
+    }
+    res.send(todo)
+  } catch (e) {
+    res.status(400).send()
+  }
+})
+
+/////////////////////////////////////////////////////////////
 
 /*
     - assumes only { title: string } is sent
@@ -40,9 +68,11 @@ router.post('/', async (req, res) => {
   try {
     const td1 = req.body
     const validation = validateType(td1, todoType)
-    
+
     if (validation.errorCount > 0) {
-      res.status(400).send({ data: null, error: validation })
+      // res.status(400).send({ data: null, error: validation })
+
+      res.status(400).send(formatReturnError(validation))
     } else {
       const td2 = {
         title: td1.title,
@@ -73,23 +103,6 @@ router.get('/:id', async (req, res) => {
     res.send(todos)
   } catch (e) {
     res.status(400).send(e)
-  }
-})
-
-router.delete('/:id', async (req, res) => {
-  try {
-    const id = req.params.id
-    yellow('id', typeof id)
-    if (!isValidStringMongoId(id)) {
-      return 
-    }
-    let todo = await findOneAndDelete('todos', id)
-    if (!todo) {
-      return res.status(404).send()
-    }
-    res.send(todo)
-  } catch (e) {
-    res.status(400).send()
   }
 })
 
