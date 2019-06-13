@@ -12,35 +12,76 @@ import { isValidMongoStringId } from 'lib'
 
 const router = express.Router()
 
+// const todoType = {
+//   title: {
+//     type: ['number', 'string'],
+//     minLength: 3,
+//     required: true
+//   },
+//   completed: {
+//     type: ['boolean'],
+//     required: false
+//   }
+// }
+
+
 const todoType = {
-  title: {
-    type: ['number', 'string'],
-    minLength: 3,
-    required: true
-  },
-  completed: {
-    type: ['boolean'],
-    required: false
-  }
+  name: 'todoType',
+  fields: [
+    {
+      name: 'title',
+      dataTypes: ['number', 'string'],
+      minLength: 3,
+      required: true
+    },
+    {
+      name: 'completed',
+      dataTypes: ['boolean'],
+      required: false
+    }
+  ]
 }
 
 const formatReturnSuccess = data => {
-  yellow('formatReturnSuccess**')
+  // yellow('formatReturnSuccess**')
   return { data: data, error: null }
 }
 
 const formatReturnError = error => {
-  // yellow('msg', error.message)
-  const msg = error.message
-
+  // yellow('error', error instanceof Error ? 'yes' : 'no')
+  // yellow('error.message', error.message)
   return { data: null, error: error.message }
 }
 
-//////////////////////////////////////////////////////
+/*
+    - assumes only { title: string } is sent
+    - { completed: false } will be added to all new todos
+ */
+router.post('/', async (req, res) => {
+  try {
+    const td1 = req.body
+    const validation = validateType(td1, todoType)
+    yellow('validation', validation)
+    if (validation.errorCount > 0) {
+      // res.status(400).send({ data: null, error: validation })
+      
+      res.status(400).send(formatReturnError(new Error(validation)))
+    } else {
+      const td2 = {
+        title: td1.title,
+        completed: false
+      }
+      const inserted = await insertOne('todos', td2)
+      res.send(inserted)
+    }
+  } catch (e) {
+    console.error('error', e)
+    res.status(400).send(e)
+  }
+})
 
 router.delete('/:id', async (req, res) => {
   const id = req.params.id
-  yellow('typeof id', id)
   try {
     
     if (!isValidMongoStringId(id)) {
@@ -55,35 +96,6 @@ router.delete('/:id', async (req, res) => {
     res.send(todo)
   } catch (e) {
     res.status(400).send()
-  }
-})
-
-/////////////////////////////////////////////////////////////
-
-/*
-    - assumes only { title: string } is sent
-    - { completed: false } will be added to all new todos
- */
-router.post('/', async (req, res) => {
-  try {
-    const td1 = req.body
-    const validation = validateType(td1, todoType)
-
-    if (validation.errorCount > 0) {
-      // res.status(400).send({ data: null, error: validation })
-
-      res.status(400).send(formatReturnError(validation))
-    } else {
-      const td2 = {
-        title: td1.title,
-        completed: false
-      }
-      const inserted = await insertOne('todos', td2)
-      res.send(inserted)
-    }
-  } catch (e) {
-    console.error('error', e)
-    res.status(400).send(e)
   }
 })
 
