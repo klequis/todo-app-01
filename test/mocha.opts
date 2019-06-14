@@ -1,4 +1,2 @@
 --require @babel/register
 --recursive
---verbose
---serial
