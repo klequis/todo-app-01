@@ -36,7 +36,7 @@ describe('todo-route POST', function() {
     })
   })
 
-  describe('test validation for POST /api/todo', function() {
+  describe.skip('test validation for POST /api/todo', function() {
     it('send it nothing at all', async function() {
       const ret = await request(app)
         .post('/api/todo')
@@ -78,7 +78,7 @@ describe('todo-route POST', function() {
         'parameter obj is invalid type [object Object]'
       )
     })
-    it.only('send too short title', async function() {
+    it('send too short title', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')

@@ -6,7 +6,7 @@ import {
   findOneAndDelete,
   findOneAndUpdate
 } from '../db'
-import validateType from 'validation'
+// import validateType from 'validation'
 import { yellow, red } from 'logger'
 import { isValidMongoStringId } from 'lib'
 
@@ -23,7 +23,6 @@ const router = express.Router()
 //     required: false
 //   }
 // }
-
 
 const todoType = {
   name: 'todoType',
@@ -60,20 +59,26 @@ const formatReturnError = error => {
 router.post('/', async (req, res) => {
   try {
     const td1 = req.body
-    const validation = validateType(td1, todoType)
-    yellow('validation', validation)
-    if (validation.errorCount > 0) {
-      // res.status(400).send({ data: null, error: validation })
-      
-      res.status(400).send(formatReturnError(new Error(validation)))
-    } else {
-      const td2 = {
-        title: td1.title,
-        completed: false
-      }
-      const inserted = await insertOne('todos', td2)
-      res.send(inserted)
+    // const validation = validateType(td1, todoType)
+    // yellow('validation', validation)
+    // if (validation.errorCount > 0) {
+    //   // res.status(400).send({ data: null, error: validation })
+
+    //   res.status(400).send(formatReturnError(new Error(validation)))
+    // } else {
+    //   const td2 = {
+    //     title: td1.title,
+    //     completed: false
+    //   }
+    //   const inserted = await insertOne('todos', td2)
+    //   res.send(inserted)
+    // }
+    const td2 = {
+      title: td1.title,
+      completed: false
     }
+    const inserted = await insertOne('todos', td2)
+    res.send(inserted)
   } catch (e) {
     console.error('error', e)
     res.status(400).send(e)
@@ -83,12 +88,13 @@ router.post('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const id = req.params.id
   try {
-    
     if (!isValidMongoStringId(id)) {
-      const err = formatReturnError(new Error(`Error: ${id} is not a valid MongoDB _id`))
+      const err = formatReturnError(
+        new Error(`Error: ${id} is not a valid MongoDB _id`)
+      )
       res.status(400).send(err)
     }
-    
+
     let todo = await findOneAndDelete('todos', id)
     if (!todo) {
       return res.status(400).send()
