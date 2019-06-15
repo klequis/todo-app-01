@@ -6,23 +6,11 @@ import {
   findOneAndDelete,
   findOneAndUpdate
 } from '../db'
-// import validateType from 'validation'
+import { check, validationResult } from 'express-validator/check'
 import { yellow, red } from 'logger'
 import { isValidMongoStringId } from 'lib'
 
 const router = express.Router()
-
-// const todoType = {
-//   title: {
-//     type: ['number', 'string'],
-//     minLength: 3,
-//     required: true
-//   },
-//   completed: {
-//     type: ['boolean'],
-//     required: false
-//   }
-// }
 
 const todoType = {
   name: 'todoType',
@@ -42,13 +30,10 @@ const todoType = {
 }
 
 const formatReturnSuccess = data => {
-  // yellow('formatReturnSuccess**')
   return { data: data, error: null }
 }
 
 const formatReturnError = error => {
-  // yellow('error', error instanceof Error ? 'yes' : 'no')
-  // yellow('error.message', error.message)
   return { data: null, error: error.message }
 }
 
@@ -56,23 +41,20 @@ const formatReturnError = error => {
     - assumes only { title: string } is sent
     - { completed: false } will be added to all new todos
  */
-router.post('/', async (req, res) => {
+router.post('/',
+[
+  check('email').isEmail(),
+  check('username').isLength(3)
+],
+async (req, res) => {
   try {
+    const errors = validationResult(req)
+    const err = errors.array()
+    yellow('err', err)
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: err })
+    }
     const td1 = req.body
-    // const validation = validateType(td1, todoType)
-    // yellow('validation', validation)
-    // if (validation.errorCount > 0) {
-    //   // res.status(400).send({ data: null, error: validation })
-
-    //   res.status(400).send(formatReturnError(new Error(validation)))
-    // } else {
-    //   const td2 = {
-    //     title: td1.title,
-    //     completed: false
-    //   }
-    //   const inserted = await insertOne('todos', td2)
-    //   res.send(inserted)
-    // }
     const td2 = {
       title: td1.title,
       completed: false

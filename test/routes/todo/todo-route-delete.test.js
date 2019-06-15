@@ -32,8 +32,6 @@ describe('todo-route DELETE', function() {
         .set('Accept', 'application/json')
         .send()
         .expect(200)
-      
-      yellow('delRes.body', delRes.body.data)
     })
     it.skip('should return invalid _id', async function() {
       const delRes = await request(app)

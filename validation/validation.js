@@ -5,7 +5,7 @@ import { yellow, blue } from 'logger'
 // null or undefined, empty
 
 const validateType = (obj, objType) => {
-  yellow('objType', objType)
+  // yellow('objType', objType)
   let errors = []
   const result = objType.fields.map(f => {
     // blue('name', f.name)

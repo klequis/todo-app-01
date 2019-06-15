@@ -38,7 +38,6 @@ describe('todo-route', function() {
         .set('Accept', 'application/json')
         .send(newData)
       const data = updateRes.body.data[0]
-      yellow('data', data)
       expect(data.title).to.equal(newData.title)
       expect(data.completed).to.equal(false)
     })

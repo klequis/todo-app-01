@@ -12,7 +12,7 @@ import { yellow } from 'logger'
 
 const collectionName = 'todos'
 
-describe('todo-route POST', function() {
+describe.only('todo-route POST', function() {
   describe('test POST /api/todo', function() {
     before(async function() {
       await dropCollection(collectionName)
@@ -36,13 +36,12 @@ describe('todo-route POST', function() {
     })
   })
 
-  describe.skip('test validation for POST /api/todo', function() {
+  describe('test validation for POST /api/todo', function() {
     it('send it nothing at all', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send()
-      yellow('ret', ret.body)
       expect(ret.body.error.errorCount).to.equal(1)
       expect(ret.body.error.errors[0].inputError).to.equal(
         'parameter obj is invalid type [object Object]'

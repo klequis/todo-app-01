@@ -20,7 +20,6 @@ describe('test lib', function() {
   })
   describe('test getObjectId', function() {
     it('valid hex id should return true', function() {
-      yellow('is', isValidMongoStringId(validHexString))
       expect(isValidMongoStringId(validHexString)).to.equal(true)
     })
     it('number should return false', function() {
