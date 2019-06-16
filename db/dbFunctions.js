@@ -2,9 +2,18 @@ import mongodb, { ObjectID } from 'mongodb'
 import { removeIdProp } from './helpers'
 import config from '../config'
 
+import { blue } from 'logger'
+
 const MongoClient = mongodb.MongoClient
 
 let client
+
+const checkCollection = (collectionName) => {
+  const check = collectionName in ['todo-prod', 'todo-dev', 'todo-test']
+  if (!check) {
+    throw new Error(`The collection ${collectioName} does not exist`)
+  }
+}
 
 const connectDB = async () => {
   if (!client) {
@@ -34,7 +43,7 @@ const formatReturnError = (functionName, error) => {
 
 const logError = (functionName, error) => {
   if (config.env !== 'production') {
-    console.error(`Error: dbFunctions.${functionName}`, error.message)
+    console.error(`Error: dbFunctions.${functionName}`, error)
   }
 }
 
@@ -116,7 +125,9 @@ export const find = async (collection, filter = {}, project = {}) => {
       .toArray()
     return formatReturnSuccess(ret)
   } catch (e) {
-    return formatReturnError('find', e)
+    // return formatReturnError('find', e)
+    blue('** throwing **')
+    throw new Error(e.message)
   }
 }
 

@@ -38,6 +38,7 @@ const formatReturnError = error => {
 }
 
 /*
+    - only intended to be used for new todos
     - assumes only { title: string } is sent
     - { completed: false } will be added to all new todos
  */
@@ -50,9 +51,8 @@ router.post('/',
 async (req, res) => {
   try {
     const errors = validationResult(req)
-    const err = errors.array()
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: err })
+      return res.status(422).json({ errors: errors.array() })
     }
     const td1 = req.body
     const td2 = {
@@ -67,16 +67,17 @@ async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', 
+[
+  check('id').isMongoId().withMessage('Parameter id must be a valid MongodDB hex string.')
+],
+async (req, res) => {
   const id = req.params.id
   try {
-    if (!isValidMongoStringId(id)) {
-      const err = formatReturnError(
-        new Error(`Error: ${id} is not a valid MongoDB _id`)
-      )
-      res.status(400).send(err)
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
     }
-
     let todo = await findOneAndDelete('todos', id)
     if (!todo) {
       return res.status(400).send()

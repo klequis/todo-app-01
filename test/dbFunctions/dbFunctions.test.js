@@ -1,4 +1,5 @@
-import { expect } from 'chai'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 import { fourTodos } from './fixture'
 import {
   close,
@@ -11,13 +12,39 @@ import {
   insertOne
 } from 'db'
 
+import { yellow } from 'logger'
+
+chai.use(chaiAsPromised)
+const expect = chai.expect
+
 const collectionName = 'todos'
 
 after(async () => {
   await close()
 })
 
-describe('dbFunctions', function() {
+
+describe('dbFunctions failure cases', function() {
+  it('debug', async function() {
+    const r = await find()
+    yellow('r', r)
+  })
+  it('should throw: collection name must be a String', async function() {
+    await expect(find()).to.eventually.be.rejectedWith(
+      Error,
+      'collection name must be a String'
+    )
+  })
+  it('should throw: collection name must be a String', async function() {
+    await expect(find('doesnt-exist')).to.eventually.be.rejectedWith(
+      Error,
+      'collection name must be a String'
+    )
+  })
+
+})
+
+describe.only('dbFunctions success cases', function() {
   describe('test insertMany', function() {
     it('insertMany: should insert 4 todos', async function() {
       const i = await insertMany(collectionName, fourTodos)
