@@ -12,6 +12,10 @@ import { yellow } from 'logger'
 
 const collectionName = 'todos'
 
+const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
+const invalidMongoId = '5d0147d82bdf2864' // this id was truncated
+const idNotFound = '5cfbe5bf4bc4b4f726a14852' // this is a valid id but not in the db
+
 describe('todo-route DELETE', function() {
   describe('test DELETE /api/todo/:id', function() {
     let _idToDelete = ''
@@ -21,27 +25,42 @@ describe('todo-route DELETE', function() {
       const findRes = await find(collectionName, {})
       expect(findRes.data.length).to.equal(4)
       const _id = findRes.data[1]._id // returns object
-      // The _ids returned by find() are objects. However, in use
+      // The _ids returned by find() are objects. However, in actual use
       // _ids will come from the client and will always be strings
       // Therefore, convert to string
       _idToDelete = _id.toHexString()
     })
     it('should delete one record', async function() {
-      const delRes = await request(app)
+      const ret = await request(app)
         .delete(`/api/todo/${_idToDelete}`)
         .set('Accept', 'application/json')
         .send()
         .expect(200)
+      const { data, error } = ret.body
+      expect(data[0].title).to.equal(fourTodos[1].title)
+      expect(data[0].completed).to.equal(false)
+      expect(error).to.equal(null)
     })
-    it.skip('should return invalid _id', async function() {
-      const delRes = await request(app)
-        // .delete(`/api/todo/${_idToDelete}`)
-        .delete(`/api/todo/'5d0147d82bdf2864'`)
+    it('should return invalid id', async function() {
+      const ret = await request(app)
+        .delete(`/api/todo/${invalidMongoId}`)
         .set('Accept', 'application/json')
         .send()
-        .expect(400)
-      // yellow('delRes.status', delRes.status)
-      // yellow('delRes.body', delRes.body)
+        .expect(422)
+      yellow('ret.body', ret.body)
+      const { errors } = ret.body
+      expect(errors[0].msg).to.equal(invalidMongoIdMsg)
     })
+    it('should return id not found', async function() {
+      const ret = await request(app)
+        .delete(`/api/todo/${idNotFound}`)
+        .set('Accept', 'application/json')
+        .send()
+        .expect(200)
+      yellow('ret.body', ret.body)
+      const { errors } = ret.body
+      expect(errors[0].msg).to.equal(notMongoId)
+    })
+
   })
 })
