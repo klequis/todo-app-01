@@ -21,7 +21,7 @@ const titleLenErr = {
   msg: 'Title must be at least 3 characters long.'
 }
 
-describe.only('todo-route POST', function() {
+describe('todo-route POST', function() {
   describe('test POST /api/todo', function() {
     before(async function() {
       await dropCollection(collectionName)
@@ -86,32 +86,29 @@ describe.only('todo-route POST', function() {
       expect(equals(errors[0], titleTypeErr)).to.equal(true)
       expect(equals(errors[1], titleLenErr)).to.equal(true)
     })
-    it.skip('send too short title', async function() {
+    it('send too short title', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send({ title: 'a' })
       const { errors } = ret.body
-      yellow('errors', errors)
-      // expect(ret.body.error.errors[0].title).to.equal(
-      //   'Incorrect length. Should be >= 3'
-      // )
+      expect(errors.length).to.equal(1)
+      expect(errors[0].msg).to.equal(titleLenErr.msg)
     })
-    it.skip('send title = 123', async function() {
+    it('send title = 123', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send({ title: 123 })
       const { errors } = ret.body
-      yellow('errors', errors)
-      // expect(ret.body.data.title).to.equal(123)
+      expect(errors[0].msg).to.equal(titleTypeErr.msg)
     })
-    it.skip('send title = "123" ', async function() {
+    it('send title = "123" ', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send({ title: '123' })
-      expect(ret.body.data.title).to.equal('123')
+      expect(ret.body.data[0].title).to.equal('123')
     })
   })
 })
