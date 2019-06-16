@@ -43,14 +43,14 @@ const formatReturnError = error => {
  */
 router.post('/',
 [
-  check('email').isEmail(),
-  check('username').isLength(3)
+  check('title').isString().withMessage('Title must be a string.'),
+  check('title').isLength({ min: 3 }).withMessage('Title must be at least 3 characters long.')
+  // check('username').isLength(3)
 ],
 async (req, res) => {
   try {
     const errors = validationResult(req)
     const err = errors.array()
-    yellow('err', err)
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: err })
     }

@@ -1,16 +1,25 @@
 import { expect } from 'chai'
 import request from 'supertest'
+import { equals } from 'ramda'
 import { fourTodos, oneTodo } from './fixture'
 import app from 'server'
-import {
-  close,
-  dropCollection,
-  find,
-} from 'db'
+import { close, dropCollection, find } from 'db'
 
 import { yellow } from 'logger'
 
 const collectionName = 'todos'
+
+const titleTypeErr = {
+  location: 'body',
+  param: 'title',
+  msg: 'Title must be a string.'
+}
+
+const titleLenErr = {
+  location: 'body',
+  param: 'title',
+  msg: 'Title must be at least 3 characters long.'
+}
 
 describe.only('todo-route POST', function() {
   describe('test POST /api/todo', function() {
@@ -42,58 +51,62 @@ describe.only('todo-route POST', function() {
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send()
-      expect(ret.body.error.errorCount).to.equal(1)
-      expect(ret.body.error.errors[0].inputError).to.equal(
-        'parameter obj is invalid type [object Object]'
-      )
+      const { errors } = ret.body
+      expect(errors.length).to.equal(2)
+      expect(equals(errors[0], titleTypeErr)).to.equal(true)
+      expect(equals(errors[1], titleLenErr)).to.equal(true)
     })
     it('send "" ', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send('')
-      expect(ret.body.error.errorCount).to.equal(1)
-      expect(ret.body.error.errors[0].inputError).to.equal(
-        'parameter obj is invalid type [object Object]'
-      )
+      const { errors } = ret.body
+      expect(errors.length).to.equal(2)
+      expect(equals(errors[0], titleTypeErr)).to.equal(true)
+      expect(equals(errors[1], titleLenErr)).to.equal(true)
     })
     it('send "a" ', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send('a')
-      expect(ret.body.error.errorCount).to.equal(1)
-      expect(ret.body.error.errors[0].inputError).to.equal(
-        'parameter obj is invalid type [object Object]'
-      )
+      const { errors } = ret.body
+      expect(errors.length).to.equal(2)
+      expect(equals(errors[0], titleTypeErr)).to.equal(true)
+      expect(equals(errors[1], titleLenErr)).to.equal(true)
     })
     it('send {}', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send({})
-      expect(ret.body.error.errorCount).to.equal(1)
-      expect(ret.body.error.errors[0].inputError).to.equal(
-        'parameter obj is invalid type [object Object]'
-      )
+      const { errors } = ret.body
+      expect(errors.length).to.equal(2)
+      expect(equals(errors[0], titleTypeErr)).to.equal(true)
+      expect(equals(errors[1], titleLenErr)).to.equal(true)
     })
-    it('send too short title', async function() {
+    it.skip('send too short title', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send({ title: 'a' })
+      const { errors } = ret.body
+      yellow('errors', errors)
       // expect(ret.body.error.errors[0].title).to.equal(
       //   'Incorrect length. Should be >= 3'
       // )
     })
-    it('send title = 123', async function() {
+    it.skip('send title = 123', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
         .send({ title: 123 })
-      expect(ret.body.data.title).to.equal(123)
+      const { errors } = ret.body
+      yellow('errors', errors)
+      // expect(ret.body.data.title).to.equal(123)
     })
-    it('send title = "123" ', async function() {
+    it.skip('send title = "123" ', async function() {
       const ret = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
