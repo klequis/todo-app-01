@@ -6,7 +6,7 @@
   "scripts": {
     "test": "NODE_ENV=testLocal NODE_PATH=./ nyc mocha --require @babel/register --verbose --serial",
     "test-watch": "export WATCH='watch' && nodemon --exec 'npm test'",
-    "start": "NODE_ENV=dev NODE_PATH=./ babel-node server/index.js"
+    "start": "NODE_ENV=dev NODE_PATH=./ nodemon --exec babel-node server/index.js"
   },
   "keywords": [],
   "author": "",

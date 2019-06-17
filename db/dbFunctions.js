@@ -8,13 +8,6 @@ const MongoClient = mongodb.MongoClient
 
 let client
 
-const checkCollection = (collectionName) => {
-  const check = collectionName in ['todo-prod', 'todo-dev', 'todo-test']
-  if (!check) {
-    throw new Error(`The collection ${collectioName} does not exist`)
-  }
-}
-
 const connectDB = async () => {
   if (!client) {
     console.log('mongoUri', config.mongoUri)
@@ -32,20 +25,20 @@ export const close = async () => {
   client = undefined
 }
 
-const formatReturnSuccess = data => {
-  return { data: data, error: null }
-}
+// const formatReturnSuccess = data => {
+//   return { data: data, error: null }
+// }
 
-const formatReturnError = (functionName, error) => {
-  logError(functionName, error)
-  return { data: null, error: error.message }
-}
+// const formatReturnError = (functionName, error) => {
+//   logError(functionName, error)
+//   return { data: null, error: error.message }
+// }
 
-const logError = (functionName, error) => {
-  if (config.env !== 'production') {
-    console.error(`Error: dbFunctions.${functionName}`, error)
-  }
-}
+// const logError = (functionName, error) => {
+//   if (config.env !== 'production') {
+//     console.error(`Error: dbFunctions.${functionName}`, error)
+//   }
+// }
 
 /**
  *
@@ -57,10 +50,10 @@ const logError = (functionName, error) => {
 export const insertMany = async (collection, data) => {
   try {
     const { db } = await connectDB()
-    const ret = await db.collection(collection).insertMany(data)
-    return formatReturnSuccess(ret.ops)
+    const r = await db.collection(collection).insertMany(data)
+    return r.ops
   } catch (e) {
-    return formatReturnError('insertMany', e)
+    throw new Error(e.message)
   }
 }
 
@@ -73,13 +66,12 @@ export const insertMany = async (collection, data) => {
 export const dropCollection = async collection => {
   try {
     const { db } = await connectDB()
-    const ret = await db.collection(collection).drop()
-    return formatReturnSuccess(ret)
+    return  await db.collection(collection).drop()
   } catch (e) {
     if ((e.message = 'ns not found')) {
-      return formatReturnSuccess(true)
+      return true
     } else {
-      return formatReturnError('insertMany', e)
+      throw new Error(e.message)
     }
   }
 }
@@ -94,10 +86,10 @@ export const dropCollection = async collection => {
 export const insertOne = async (collection, data) => {
   try {
     const { db } = await connectDB()
-    const ret = await db.collection(collection).insertOne(data)
-    return formatReturnSuccess(ret.ops)
+    const r = await db.collection(collection).insertOne(data)
+    return r.ops
   } catch (e) {
-    return formatReturnError('insertOne', e)
+    throw new Error(e.message)
   }
 }
 
@@ -116,17 +108,16 @@ export const find = async (collection, filter = {}, project = {}) => {
   // Going to try to always pass back the id as a string and see how it goes
   // ** check other functions where ObjectID may be passed back
   // actuall, maybe I don't care?
+  // blue('filter', filter)
   try {
     const { db } = await connectDB()
-    const ret = await db
+    return await db
       .collection(collection)
       .find(filter)
       .project(project)
       .toArray()
-    return formatReturnSuccess(ret)
+    
   } catch (e) {
-    // return formatReturnError('find', e)
-    blue('** throwing **')
     throw new Error(e.message)
   }
 }
@@ -141,14 +132,13 @@ export const find = async (collection, filter = {}, project = {}) => {
 export const findById = async (collection, id, project = {}) => {
   try {
     const { db } = await connectDB()
-    const ret = await db
+    return await db
       .collection(collection)
       .find({ _id: ObjectID(id) })
       .project(project)
       .toArray()
-    return formatReturnSuccess(ret)
   } catch (e) {
-    return formatReturnError('findById', e)
+    throw new Error(e.message)
   }
 }
 
@@ -161,13 +151,21 @@ export const findById = async (collection, id, project = {}) => {
 export const findOneAndDelete = async (collection, id) => {
   try {
     const { db } = await connectDB()
-    const ret = await db
+    const r = await db
       .collection(collection)
       .findOneAndDelete({ _id: ObjectID(id) })
-    return formatReturnSuccess([ret.value])
+    blue('r', r)    
+    blue('value',  typeof r.lastErrorObject.value === 'undefined')
+    const { n, value } = r.lastErrorObject
+    if ( n === 0 && typeof value === 'undefined') {
+      blue('not found********************************')
+      // throw an error
+      throw new Error(`No document found for _id ${id}`)
+    }
+    return [r.value]
   } catch (e) {
-    red('e', e)
-    return formatReturnError('findOneAndDelete', e)
+    blue('e.message', e.message)
+    throw new Error(e.message)
   }
 }
 
@@ -190,15 +188,15 @@ export const findOneAndUpdate = async (
     // if the filter has the _id prop, remove it
     const cleanedUpdate = removeIdProp(update)
     const { db } = await connectDB()
-    const ret = await db
+    const r = await db
       .collection(collection)
       .findOneAndUpdate(
         { _id: ObjectID(id) },
         { $set: cleanedUpdate },
         { returnOriginal: returnOriginal }
       )
-    return formatReturnSuccess([ret.value])
+    return [r.value]
   } catch (e) {
-    return formatReturnError('findOneAndUpdate', e)
+    throw new Error(e.message)
   }
 }

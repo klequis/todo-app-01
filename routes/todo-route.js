@@ -7,7 +7,7 @@ import {
   findOneAndUpdate
 } from '../db'
 import { check, validationResult } from 'express-validator/check'
-import { yellow, red } from 'logger'
+import { green, red } from 'logger'
 import { isValidMongoStringId } from 'lib'
 
 const router = express.Router()
@@ -79,16 +79,20 @@ async (req, res) => {
       return res.status(422).json({ errors: errors.array() })
     }
     let todo = await findOneAndDelete('todos', id)
+    // green('todo', todo)
+
     if (!todo) {
       return res.status(400).send()
     }
     res.send(todo)
   } catch (e) {
-    res.status(400).send()
+    // green('router.delete.catch: e', e.message)
+    res.status(400).send(e.message)
   }
 })
 
 router.get('/', async (req, res) => {
+  green('get ****')
   try {
     const todos = await find('todos')
     res.send(todos)

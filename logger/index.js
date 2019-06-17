@@ -3,7 +3,7 @@ import chalk from 'chalk'
 const log = console.log
 
 const checkValue = (value) => {
-  if (!value) {
+  if (typeof value === undefined) {
     return ''
   } else {
     return value
