@@ -9,6 +9,8 @@ const MongoClient = mongodb.MongoClient
 let client
 
 const connectDB = async () => {
+  try {
+  blue('connect **')
   if (!client) {
     console.log('mongoUri', config.mongoUri)
     client = await MongoClient.connect(config.mongoUri, {
@@ -16,6 +18,10 @@ const connectDB = async () => {
     })
   }
   return { db: client.db(config.dbName) }
+  } catch (e){
+    throw new Error('Unable to connect to MongoDB')
+  }
+
 }
 
 export const close = async () => {
@@ -118,6 +124,7 @@ export const find = async (collection, filter = {}, project = {}) => {
       .toArray()
     
   } catch (e) {
+    blue('find throws', e.message)
     throw new Error(e.message)
   }
 }
