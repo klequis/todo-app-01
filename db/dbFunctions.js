@@ -10,7 +10,6 @@ let client
 
 const connectDB = async () => {
   try {
-  blue('connect **')
   if (!client) {
     console.log('mongoUri', config.mongoUri)
     client = await MongoClient.connect(config.mongoUri, {
