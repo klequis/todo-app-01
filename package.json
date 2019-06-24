@@ -1,5 +1,5 @@
 {
-  "name": "wrapping-calls-to-mongodb",
+  "name": "express-server-part-ii",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,6 +7,11 @@
     "test": "NODE_ENV=testLocal NODE_PATH=./ nyc mocha --require @babel/register --verbose --serial",
     "test-watch": "export WATCH='watch' && nodemon --exec 'npm test'",
     "start": "NODE_ENV=dev NODE_PATH=./ nodemon --exec babel-node server/index.js"
+    "delete-dist": "rm -rf dist",
+    "transcompile": "babel . -d dist --ignore node_modules --source-maps",
+    "copy": "cp package.json dist/package.json",
+    "install-prod": "cd dist && npm i --production",
+    "build": "npm run-script delete-dist && npm run-script transcompile && npm run-script copy && npm run-script install-prod"
   },
   "keywords": [],
   "author": "",
