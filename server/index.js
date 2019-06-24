@@ -13,10 +13,13 @@ app.use(bodyParser.json())
 app.use(morgan('dev'))
 
 app.use('/api/todo', todo)
-app.get('*', (req, res) => {
-  red('Unknown endpoint!')
-  res.status(404).send('Unknown endpoint')
+app.use(function(req, res, next) {
+  res.status(404).send("Sorry can't find that!")
 })
+// app.get('*', (req, res) => {
+//   red('Unknown endpoint!')
+//   res.status(404).send('Unknown endpoint')
+// })
 
 if (!module.parent) {
   app.listen(config.port, () => {

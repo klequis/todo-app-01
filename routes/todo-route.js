@@ -85,6 +85,7 @@ router.post(
 
 router.get('/', async (req, res) => {
   // green('get ****')
+  // green('req', req)
   try {
     const todos = await find('todos')
     res.send(todos)
@@ -93,6 +94,11 @@ router.get('/', async (req, res) => {
     res.status(err.status).send(err)
   }
 })
+
+/**
+ * @param {string} id A valid MongoDB _id
+ * 
+ */
 
 router.delete(
   '/:id',
@@ -103,7 +109,7 @@ router.delete(
   ],
   async (req, res) => {
     const id = req.params.id
-    
+    green('delete: id', id)
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -132,8 +138,8 @@ router.get(
   ],
   async (req, res) => {
     // green('get/:id ****')
-    const id = req.params.id
-    green('id', id)
+    // const id = req.params.id
+    // green('id', id)
     try {
       const errors = validationResult(req)
       // green('errors', errors)
@@ -155,10 +161,11 @@ router.get(
   }
 )
 
-router.patch('/:id', async (req, res) => {
+router.patch('/', async (req, res) => {
   try {
-    const id = req.params.id
-    const u = await findOneAndUpdate('todos', id, req.body)
+    const todo = req.body
+    green('todo', todo)
+    const u = await findOneAndUpdate('todos', todo._id, todo)
     res.send(u)
   } catch (e) {
     res.status(400).send(e)
