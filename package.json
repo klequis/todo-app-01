@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=testLocal NODE_PATH=./ nyc mocha --require @babel/register --verbose --serial",
+    "test": "NODE_ENV=testLocal NODE_PATH=./ nyc mocha --require @babel/register",
     "test-watch": "export WATCH='watch' && nodemon --exec 'npm test'",
-    "start": "NODE_ENV=dev NODE_PATH=./ nodemon --exec babel-node server/index.js"
+    "start": "NODE_ENV=dev NODE_PATH=./ nodemon --exec babel-node server/index.js",
     "delete-dist": "rm -rf dist",
     "transcompile": "babel . -d dist --ignore node_modules --source-maps",
     "copy": "cp package.json dist/package.json",
@@ -22,7 +22,7 @@
     "chalk": "^2.4.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "express-validator": "^5.3.1",
+    "express-validator": "^6.0.1",
     "mongodb": "^3.2.7",
     "morgan": "^1.9.1",
     "ramda": "^0.26.1",

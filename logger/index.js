@@ -37,4 +37,27 @@ export const yellowf = (message, value) => {
 export const bluef = (message, value) => {
   log(chalk.blue(`${message}`), checkValue(value))
 }
-export default { red, green, yellow, blue, redf, greenf, yellowf, bluef }
+
+export const logResponse = res => {
+  console.log('******************')
+  const r = {
+    text: res.text,
+    body: res.body,
+    headers: res.headers,
+    status: res.status,
+    ok: res.ok,
+    clientError: res.clientError,
+    serverError: res.serverError,
+    // error: res.error,
+    type: res.type,
+    charset: res.charset
+  }
+  if (res.ok) {
+    log(chalk.bgGreen('response'), r)
+  } else {
+    log(chalk.bgRed('response'), r)
+  }
+  
+}
+
+// export default { red, green, yellow, blue, redf, greenf, yellowf, bluef, logResponse }

@@ -12,7 +12,6 @@ const validateType = (obj, objType) => {
     // blue('dataTypes', f.dataTypes)
     // blue('minLength', typeof f.minLength)
     const required = f.required === undefined ? false : f.required
-    blue('required', required)
     // const fieldName = f.name
     // yellow('fieldName', fieldName)
 

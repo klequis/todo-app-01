@@ -13,10 +13,10 @@ import { yellow } from 'logger'
 const collectionName = 'todos'
 
 const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
-const invalidMongoId = '5d0147d82bdf2864' // this id was truncated
+const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
 const idNotFound = '5cfbe5bf4bc4b4f726a14852' // this is a valid id but not in the db
 
-describe.only('todo-route DELETE', function() {
+describe('todo-route DELETE', function() {
   describe('test DELETE /api/todo/:id', function() {
     let _idToDelete = ''
     before(async function() {
@@ -55,10 +55,10 @@ describe.only('todo-route DELETE', function() {
         .set('Accept', 'application/json')
         .send()
         .expect(400)
-      yellow('r.body', r)
-      // const { errors } = r.body
-      // yellow('errors', errors)
-      // expect(errors[0].msg).to.equal(notMongoId)
+      const err = r.body
+      expect(err.type).to.equal('Bad request')
+      expect(err.message).to.equal('_id not found')
+      expect(err.errors.length).to.equal(0)
     })
 
   })

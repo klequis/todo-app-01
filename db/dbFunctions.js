@@ -123,7 +123,6 @@ export const find = async (collection, filter = {}, project = {}) => {
       .toArray()
     
   } catch (e) {
-    blue('find throws', e.message)
     throw new Error(e.message)
   }
 }
@@ -160,17 +159,13 @@ export const findOneAndDelete = async (collection, id) => {
     const r = await db
       .collection(collection)
       .findOneAndDelete({ _id: ObjectID(id) })
-    blue('r', r)    
-    blue('value',  typeof r.lastErrorObject.value === 'undefined')
     const { n, value } = r.lastErrorObject
     if ( n === 0 && typeof value === 'undefined') {
-      blue('not found********************************')
       // throw an error
       throw new Error(`No document found for _id ${id}`)
     }
     return [r.value]
   } catch (e) {
-    blue('e.message', e.message)
     throw new Error(e.message)
   }
 }
