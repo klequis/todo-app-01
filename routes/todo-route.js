@@ -7,7 +7,7 @@ import {
   findOneAndUpdate
 } from '../db'
 import { check, validationResult } from 'express-validator'
-import { green, red } from 'logger'
+import { yellow, red } from 'logger'
 import { removeIdProp } from 'db/helpers'
 
 const router = express.Router()
@@ -24,8 +24,6 @@ const getError = error => {
       errors: []
     }
   }
-  // const includes = str => errMsg.includes(str)
-
   return {
     status: 500,
     type: 'Internal server error',
@@ -126,7 +124,7 @@ router.get(
         green('errors.array()', errors.array())
         return res.status(422).json({ errors: errors.array() })
       }
-      const id = req.body.id
+      const id = req.params.id
       const td1 = await findById('todos', id)
       res.send(td1)
     } catch (e) {
