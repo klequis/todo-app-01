@@ -1,23 +1,23 @@
 import settings from './config.settings'
 
-const unknowEnvName = 'ERROR: config/indes.js: unknown environment name. Must be testLocal, testRemote, dev or prod'
+const unknowEnvName = 'ERROR: config/index.js: unknown environment name. Must be testLocal, testRemote, dev or prod'
 
 export const mongoUri = env => {
   switch (env) {
     case 'testLocal':
       console.log('env: ', env)
-      console.log('monguUri: ', settings.testLocal.mongoUri)
-      return settings.testLocal.mongoUri
+      console.log('monguUri: ', settings.db.testLocal.mongoUri)
+      return settings.db.testLocal.mongoUri
     case 'testRemote':
       console.log('env: ', env)
-      console.log('monguUri: ', settings.testRemote.mongoUri)
-      return settings.testRemote.mongoUri
+      console.log('monguUri: ', settings.db.testRemote.mongoUri)
+      return settings.db.testRemote.mongoUri
     case 'dev':
       console.log('env: ', env)
-      console.log('monguUri: ', settings.dev.mongoUri)
-      return settings.dev.mongoUri
+      console.log('monguUri: ', settings.db.dev.mongoUri)
+      return settings.db.dev.mongoUri
     case 'prod':
-      return settings.prod.mongoUri
+      return settings.db.prod.mongoUri
     default:
       throw new Error(unknowEnvName)
   }
@@ -59,5 +59,6 @@ export default {
   dbName: dbName(process.env.NODE_ENV),
   apiRoot: apiRoot(process.env.NODE_ENV),
   port: 3030,
-  env: process.env.NODE_ENV
+  env: process.env.NODE_ENV,
+  auth0: settings.auth0
 };
