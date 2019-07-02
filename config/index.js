@@ -1,3 +1,5 @@
+// settings are in keybase
+
 import settings from './config.settings'
 
 const unknowEnvName = 'ERROR: config/index.js: unknown environment name. Must be testLocal, testRemote, dev or prod'
