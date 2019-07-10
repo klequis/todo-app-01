@@ -10,22 +10,34 @@ const jwksRsa = require('jwks-rsa')
 
 import { yellow, red } from 'logger'
 
+
+
+
 yellow('config', config)
+
+const authConfig = {
+  domain: 'klequis-todo.auth0.com',
+  audience: 'https://klequis-todo.tk'
+}
 
 const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: config.auth0.jwksUri
+    // jwksUri: config.auth0.jwksUri
+    jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`
   }),
 
-  // Validate the audience and the issuer.
-  audience: config.auth0.appIdentifier,
+  // audience: config.auth0.appIdentifier,
+  audience: authConfig.audience,
+
   // issuer: `https://<AUTH0_DOMAIN>/`,
-  issuer: `https://${process.env.AUTH0_DOMAIN}/`,
-  // algorithms: ["RS256"]
-  algorithms: config.auth0.algorithms
+  // issuer: `https://${process.env.AUTH0_DOMAIN}/`,
+  issuer: `https://${authConfig.domain}/`,
+
+  // algorithm: config.auth0.algorithms
+  algorithm: ["RS256"]
 })
 
 const app = express()
