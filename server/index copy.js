@@ -1,16 +1,16 @@
 import express from 'express'
-import morgan from 'morgan'
-import helmet from 'helmet'
-
 import bodyParser from 'body-parser'
 import cors from 'cors'
+import helmet from 'helmet'
+import morgan from 'morgan'
 import todo from 'routes/todo-route'
 import config from 'config'
+const jwt = require('express-jwt')
+const jwksRsa = require('jwks-rsa')
 
 import { yellow, red } from 'logger'
 
-const jwt = require('express-jwt')
-const jwksRsa = require('jwks-rsa')
+
 
 
 yellow('config', config)
@@ -20,20 +20,24 @@ const authConfig = {
   audience: 'https://klequis-todo.tk'
 }
 
-export const checkJwt = jwt({
+const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `https://klequis-todo.auth0.com/.well-known/jwks.json`
+    // jwksUri: config.auth0.jwksUri
+    jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`
   }),
 
-  audience: "https://klequis-todo.tk",
-  
-  issuer: `https://klequis-todo.auth0.com/`,
+  // audience: config.auth0.appIdentifier,
+  audience: authConfig.audience,
+
+  // issuer: `https://<AUTH0_DOMAIN>/`,
+  // issuer: `https://${process.env.AUTH0_DOMAIN}/`,
+  issuer: `https://${authConfig.domain}/`,
 
   // algorithm: config.auth0.algorithms
-  algorithm: ['RS256']
+  algorithm: ["RS256"]
 })
 
 const app = express()
