@@ -20,7 +20,6 @@ const connectDB = async () => {
   } catch (e){
     throw new Error('Unable to connect to MongoDB')
   }
-
 }
 
 export const close = async () => {
