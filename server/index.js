@@ -4,18 +4,13 @@ import helmet from 'helmet'
 
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import config from 'config'
-
-import { yellow, red } from 'logger'
+import config from '../config'
 
 // import todo from 'routes/todo-route'
 import todo from '../routes/todo-route'
 
 const jwt = require('express-jwt')
 const jwksRsa = require('jwks-rsa')
-
-
-yellow('config', config)
 
 const authConfig = {
   domain: 'klequis-todo.auth0.com',

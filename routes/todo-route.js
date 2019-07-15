@@ -7,8 +7,8 @@ import {
   findOneAndUpdate
 } from '../db'
 import { check, validationResult } from 'express-validator'
-import { yellow, red } from 'logger'
-import { removeIdProp } from 'db/helpers'
+import { yellow, red } from '../logger'
+import { removeIdProp } from '../db/helpers'
 
 // const jwt = require('express-jwt')
 // const jwksRsa = require('jwks-rsa')
