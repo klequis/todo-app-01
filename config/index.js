@@ -1,6 +1,7 @@
 // settings are in keybase
 
 import settings from './config.settings'
+import { yellow } from '../logger'
 
 const TEST_LOCAL = 'testLocal'
 const TEST_REMOTE = 'testRemote'
@@ -11,6 +12,8 @@ const PROD = 'production'
 const unknowEnvName = (env) => `ERROR: config/index.js: unknown environment name: ${env}. Must be ${TEST_LOCAL}, ${TEST_REMOTE}, ${DEV} or ${PROD}`
 
 export const mongoUri = env => {
+  yellow('env', env)
+  yellow('settings', settings)
   switch (env) {
     case TEST_LOCAL:
       console.log('env: ', env)
@@ -25,8 +28,8 @@ export const mongoUri = env => {
       console.log('monguUri: ', settings.db.development.mongoUri)
       return settings.db.development.mongoUri
     case PROD:
-      console.log('settings.db.prod.mongoUri', settings.db.production.mongoUri)
-      return settings.db.prod.mongoUri
+      console.log('settings.db.production.mongoUri', settings.db.production.mongoUri)
+      return settings.db.production.mongoUri
     default:
       throw new Error(unknowEnvName())
   }
