@@ -1,7 +1,6 @@
 // settings are in keybase
 
 import settings from './config.settings'
-import { Test } from 'mocha';
 
 const TEST_LOCAL = 'testLocal'
 const TEST_REMOTE = 'testRemote'
@@ -29,7 +28,7 @@ export const mongoUri = env => {
       console.log('settings.db.prod.mongoUri', settings.db.production.mongoUri)
       return settings.db.prod.mongoUri
     default:
-      throw new Error(unknowEnvName)
+      throw new Error(unknowEnvName())
   }
 }
 
@@ -44,7 +43,7 @@ export const dbName = env => {
     case PROD:
       return settings.dbName.production
     default:
-      throw new Error(unknowEnvName)
+      throw new Error(unknowEnvName())
   }
 }
 
@@ -59,7 +58,7 @@ export const apiRoot = (env)  => {
     case PROD:
       return settings.apiRoot.remote
     default:
-      throw new Error(unknowEnvName)
+      throw new Error(unknowEnvName())
   }
 }
 
