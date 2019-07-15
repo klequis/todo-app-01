@@ -19,6 +19,7 @@ export const mongoUri = env => {
       console.log('monguUri: ', settings.db.dev.mongoUri)
       return settings.db.dev.mongoUri
     case 'prod':
+      console.log('settings.db.prod.mongoUri', settings.db.prod.mongoUri)
       return settings.db.prod.mongoUri
     default:
       throw new Error(unknowEnvName)

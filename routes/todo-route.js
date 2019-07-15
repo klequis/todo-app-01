@@ -16,6 +16,7 @@ import { removeIdProp } from 'db/helpers'
 const router = express.Router()
 
 const getError = error => {
+  yellow('process.env.NODE_ENV')
   if (process.env.NODE_ENV !== 'production') {
     red('todo-route ERROR:', error.message)
   }
