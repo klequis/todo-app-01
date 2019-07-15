@@ -1,25 +1,32 @@
 // settings are in keybase
 
 import settings from './config.settings'
+import { Test } from 'mocha';
 
-const unknowEnvName = 'ERROR: config/index.js: unknown environment name. Must be testLocal, testRemote, dev or prod'
+const TEST_LOCAL = 'testLocal'
+const TEST_REMOTE = 'testRemote'
+const DEV = 'development'
+const PROD = 'production'
+
+
+const unknowEnvName = (env) => `ERROR: config/index.js: unknown environment name: ${env}. Must be ${TEST_LOCAL}, ${TEST_REMOTE}, ${DEV} or ${PROD}`
 
 export const mongoUri = env => {
   switch (env) {
-    case 'testLocal':
+    case TEST_LOCAL:
       console.log('env: ', env)
       console.log('monguUri: ', settings.db.testLocal.mongoUri)
       return settings.db.testLocal.mongoUri
-    case 'testRemote':
+    case TEST_REMOTE:
       console.log('env: ', env)
       console.log('monguUri: ', settings.db.testRemote.mongoUri)
       return settings.db.testRemote.mongoUri
-    case 'dev':
+    case DEV:
       console.log('env: ', env)
-      console.log('monguUri: ', settings.db.dev.mongoUri)
-      return settings.db.dev.mongoUri
-    case 'prod':
-      console.log('settings.db.prod.mongoUri', settings.db.prod.mongoUri)
+      console.log('monguUri: ', settings.db.development.mongoUri)
+      return settings.db.development.mongoUri
+    case PROD:
+      console.log('settings.db.prod.mongoUri', settings.db.production.mongoUri)
       return settings.db.prod.mongoUri
     default:
       throw new Error(unknowEnvName)
@@ -28,14 +35,14 @@ export const mongoUri = env => {
 
 export const dbName = env => {
   switch (env) {
-    case 'testLocal':
+    case TEST_LOCAL:
       return settings.dbName.test
-    case 'testRemote':
+    case TEST_REMOTE:
       return settings.dbName.test
-    case 'dev':
-      return settings.dbName.dev
-    case 'prod':
-      return settings.dbName.prod
+    case DEV:
+      return settings.dbName.development
+    case PROD:
+      return settings.dbName.production
     default:
       throw new Error(unknowEnvName)
   }
@@ -45,11 +52,11 @@ export const apiRoot = (env)  => {
   console.log('apiRoot: env', env);
   
   switch (env) {
-    case 'testLocal':
-    case 'dev':
+    case TEST_LOCAL:
+    case DEV:
       return settings.apiRoot.local
-    case 'testRemote':
-    case 'prod':
+    case TEST_REMOTE:
+    case PROD:
       return settings.apiRoot.remote
     default:
       throw new Error(unknowEnvName)

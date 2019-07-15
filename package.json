@@ -6,8 +6,8 @@
   "scripts": {
     "test": "NODE_ENV=testLocal NODE_PATH=./ nyc mocha --require @babel/register",
     "test-watch": "export WATCH='watch' && nodemon --exec 'npm test'",
-    "start": "NODE_ENV=dev NODE_PATH=./ nodemon --exec babel-node server/index.js",
-    "start-prod": "NODE_ENV=dev NODE_PATH=./ node server/index.js",
+    "start": "NODE_ENV=development NODE_PATH=./ nodemon --exec babel-node server/index.js",
+    "start-prod": "NODE_ENV=production NODE_PATH=./ node server/index.js",
     "delete-dist": "rm -rf dist",
     "transcompile": "babel . -d dist --ignore node_modules --source-maps",
     "copy": "cp package.json dist/package.json",
