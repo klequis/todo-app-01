@@ -6,9 +6,13 @@ module.exports = function (api) {
     "@babel/plugin-transform-runtime",
     "istanbul"
   ]
+  const ignore = [
+    'ecosystem.config.js'
+  ]
 
   return {
     presets,
-    plugins
+    plugins,
+    ignore
   }
 }

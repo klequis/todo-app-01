@@ -3,6 +3,8 @@
   - use rimraf to delete a non-empty directory which can be done with Node but not as easily.
 */
 
+l('Starting build ... ')
+
 const cp = require('child_process')
 cp.execSync('npm i -D fs-extra rimraf')
 
@@ -15,7 +17,13 @@ const execSync = require('child_process').execSync
 // final path for app
 const appPath = path.normalize(`${__dirname}/../app`)
 
-// remove ../app it it already exists
+if (fs.existsSync('../ecosystem.config.js')) {
+  fs.unlinkSync('../ecosystem.config.js')
+}
+
+fs.copyFileSync('ecosystem.config.js', `${__dirname}/../ecosystem.config.js`)
+
+// remove ../app if it already exists
 if (fs.existsSync(appPath)) {
   rimraf.sync(appPath, {}, function () { console.log("done"); });
 }
