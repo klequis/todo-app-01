@@ -12,11 +12,6 @@ import todo from '../routes/todo-route'
 const jwt = require('express-jwt')
 const jwksRsa = require('jwks-rsa')
 
-const authConfig = {
-  domain: 'klequis-todo.auth0.com',
-  audience: 'https://klequis-todo.tk'
-}
-
 export const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
@@ -43,9 +38,10 @@ app.use(morgan('dev'))
 
 app.get('/ping', async (req, res) => {
   try {
-    res.send('all good here')
+    res.send(JSON.stringify({ status: 'All good here.'}))
   } catch (e) {
-    res.send('something went wrong')
+    res.send()
+    res.send(JSON.stringify({ status: 'Something went wrong.' }))
   }
 })
 
