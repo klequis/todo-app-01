@@ -12,8 +12,8 @@ const PROD = 'production'
 const unknowEnvName = (env) => `ERROR: config/index.js: unknown environment name: ${env}. Must be ${TEST_LOCAL}, ${TEST_REMOTE}, ${DEV} or ${PROD}`
 
 export const mongoUri = env => {
-  yellow('env', env)
-  yellow('settings', settings)
+  // yellow('env', env)
+  // yellow('settings', settings)
   switch (env) {
     case TEST_LOCAL:
       console.log('env: ', env)
