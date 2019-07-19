@@ -16,6 +16,26 @@ const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
 const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
 const idNotFound = '5cfbe5bf4bc4b4f726a14852' // this is a valid id but not in the db
 
+describe.only('get a token', function () {
+  it.only('should return an access token', async function() {
+    const r = await request(app)
+      .post('https://klequis-todo.auth0.com/oauth/token')
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .field('grant_type', 'password')
+      .field('username', 'klequis@gmail.com')
+      .field('password', 'Snowman01')
+      .field('audience', 'https://klequis-todo.tk')
+      // .field('scope', 'read:sample')
+      .field('client_id', 'Hav4pitWXpDGkMaAxpj7rxHYuwAZovyI')
+      .field(
+        'client_secret',
+        '3u7L_nwvhZXMsaNaQD-hvPiJu1hRctuNzXaQiYKfTA1iLXABrl0BjYLlXZ3dPx0I'
+      )
+      .send()
+      .expect(200)
+  })
+})
+
 describe('todo-route DELETE', function() {
   describe('test DELETE /api/todo/:id', function() {
     let _idToDelete = ''
