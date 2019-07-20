@@ -15,3 +15,4 @@ lib-cov
 .node_repl_history
 .nyc_output
 config.settings.js
+tmp.js

@@ -8,25 +8,28 @@ import config from '../config'
 
 // import todo from 'routes/todo-route'
 import todo from '../routes/todo-route'
+import { yellow } from '../logger';
 
 const jwt = require('express-jwt')
 const jwksRsa = require('jwks-rsa')
 
-export const checkJwt = jwt({
+
+
+const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `https://klequis-todo.auth0.com/.well-known/jwks.json`
+    jwksUri: config.auth0.jwksUri
   }),
-
-  audience: "https://klequis-todo.tk",
-  
-  issuer: `https://klequis-todo.auth0.com/`,
-
-  // algorithm: config.auth0.algorithms
-  algorithm: ['RS256']
+  audience: config.auth0.apiIdentifier,
+  issuer: config.auth0.auth0Domain,
+  algorithm: config.auth0.algorithm
 })
+
+const abc = () => {
+  return
+}
 
 const app = express()
 
@@ -45,13 +48,37 @@ app.get('/ping', async (req, res) => {
   }
 })
 
-app.use(checkJwt)
+// app.use(checkJwt)
 app.use('/api/todo', todo)
 
 
-app.use(function(req, res, next) {
-  res.status(404).send('Unknown endpoint')
+app.use(function(err, req, res, next) {
+  
+  yellow('err', err.message)
+  if (false) {
+    res.status(404).send('Unknown endpoint')
+  } else {
+    next(err)
+  }
 })
+
+// app.use(function(err, req, res, next) {
+//   yellow(err.stack)
+//   res.status(500).send('Something broke!')
+// })
+
+// app.use(function(err, req, res, next) {
+//   yellow('err', err)
+//   res.status(404).send('Unknown endpoint')
+//   // if (err.name === 'UnauthorizedError') {
+//   //   yellow('UnauthorizedError')
+//   //   res.status(401).send('invalid token...')
+//   // }
+//   // yellow('other error')
+//   // res.status(404).send('Unknown endpoint')
+// })
+
+
 
 if (!module.parent) {
   app.listen(config.port, () => {

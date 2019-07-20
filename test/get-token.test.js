@@ -7,7 +7,7 @@ import { fourTodos } from './routes/todo/fixture'
 
 const collectionName = 'todos'
 
-describe.only('test getToken()', function() {
+describe('test getToken()', function() {
   let token
   before(async function() {
     token = await getToken()
