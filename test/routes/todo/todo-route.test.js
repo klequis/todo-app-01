@@ -27,6 +27,7 @@ describe.only('todo-route', function() {
         .set('Accept', 'application/json')
         .set('Authorization', `Bearer ${token.access_token}`)
         .send()
+      // yellow('r', r)
       expect(404)
       yellow('statusCode', r.statusCode)
       yellow('statusMessage', r.statusMessage)
