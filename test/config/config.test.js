@@ -15,17 +15,9 @@ describe('test config', function() {
   it('test apiRoot(testLocal)', function() {
     expect(apiRoot(testLocal)).to.equal('https://api.klequis-todo.tk')
   })
+
+  // ** can't run test when not in test
   // dev
-  it('test mongoUri(dev) - should return true', function() {
-    const mongoUriRegEx = /mongodb:\/\/devUser:.*@localhost:27017\/todo-dev/g
-    expect(mongoUriRegEx.test(mongoUri(dev))).to.equal(true)
-  })
-  it('test dbName(dev)', function() {
-    expect(dbName(dev)).to.equal('todo-dev')
-  })
-  it('test apiRoot(dev)', function() {
-    expect(apiRoot(dev)).to.equal('https://api.klequis-todo.tk')
-  })
   // testRemote - no tests
   // prod - no tests
 })
