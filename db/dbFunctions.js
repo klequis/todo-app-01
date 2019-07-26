@@ -8,14 +8,13 @@ let client
 
 const connectDB = async () => {
   try {
-  if (!client) {
-    console.log('mongoUri', config.mongoUri)
-    client = await MongoClient.connect(config.mongoUri, {
-      useNewUrlParser: true
-    })
-  }
-  return { db: client.db(config.dbName) }
-  } catch (e){
+    if (!client) {
+      client = await MongoClient.connect(config.mongoUri, {
+        useNewUrlParser: true
+      })
+    }
+    return { db: client.db(config.dbName) }
+  } catch (e) {
     throw new Error('Unable to connect to MongoDB')
   }
 }
@@ -68,7 +67,7 @@ export const insertMany = async (collection, data) => {
 export const dropCollection = async collection => {
   try {
     const { db } = await connectDB()
-    return  await db.collection(collection).drop()
+    return await db.collection(collection).drop()
   } catch (e) {
     if ((e.message = 'ns not found')) {
       return true
@@ -118,7 +117,6 @@ export const find = async (collection, filter = {}, project = {}) => {
       .find(filter)
       .project(project)
       .toArray()
-    
   } catch (e) {
     throw new Error(e.message)
   }
@@ -157,7 +155,7 @@ export const findOneAndDelete = async (collection, id) => {
       .collection(collection)
       .findOneAndDelete({ _id: ObjectID(id) })
     const { n, value } = r.lastErrorObject
-    if ( n === 0 && typeof value === 'undefined') {
+    if (n === 0 && typeof value === 'undefined') {
       // throw an error
       throw new Error(`No document found for _id ${id}`)
     }
