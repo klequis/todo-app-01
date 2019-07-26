@@ -10,21 +10,18 @@ import { check, validationResult } from 'express-validator'
 import { yellow, red } from '../logger'
 import { removeIdProp } from '../db/helpers'
 
-// const jwt = require('express-jwt')
-// const jwksRsa = require('jwks-rsa')
-
 const router = express.Router()
 
 const getError = error => {
-  yellow('process.env.NODE_ENV')
+  yellow('getError: error', error)
   if (process.env.NODE_ENV !== 'production') {
     red('todo-route ERROR:', error.message)
   }
   if (error.message.includes('No document found')) {
     return {
-      status: 400,
+      status: 404,
       type: 'Bad request',
-      message: '_id not found',
+      message: 'resource not found',
       errors: []
     }
   }
@@ -35,22 +32,6 @@ const getError = error => {
     errors: []
   }
 }
-
-// export const checkJwt = jwt({
-//   secret: jwksRsa.expressJwtSecret({
-//     cache: true,
-//     rateLimit: true,
-//     jwksRequestsPerMinute: 5,
-//     jwksUri: `https://klequis-todo.auth0.com/.well-known/jwks.json`
-//   }),
-
-//   audience: 'https://klequis-todo.tk',
-
-//   issuer: `https://klequis-todo.auth0.com/`,
-
-//   // algorithm: config.auth0.algorithms
-//   algorithm: ['RS256']
-// })
 
 /*
     - only intended to be used for new todos
@@ -167,30 +148,3 @@ router.patch('/', async (req, res) => {
 })
 
 export default router
-
-
-// const getError = error => {
-//   if (process.env.NODE_ENV !== 'production') {
-//     red('todo-route ERROR:', error)
-//   }
-//   const err500 = [
-//     'failed to reconnect',
-//     'failed to connect to server',
-//     'MongoNetworkError',
-//     'ECONNREFUSED',
-//     'Unable to connect to MongoDB'
-//   ]
-
-//   const includes = str => errMsg.includes(str)
-
-//   if (err500.some(includes)) {
-//   return {
-//     status: 500,
-//     type: 'Internal server error',
-//     message: 'Internal server error.',
-//     errors: []
-//   }
-//   } else {
-
-//   }
-// }
