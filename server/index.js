@@ -35,7 +35,7 @@ const error = (err, req, res, next) => {
   } else {
     yellow('err', err)
   res.status(500)
-  res.send('Internal server error zzzzzzzzzzzzzzzzzzzz')
+  res.send('Internal server error')
   }
   
 }
