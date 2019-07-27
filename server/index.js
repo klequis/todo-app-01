@@ -34,8 +34,8 @@ const error = (err, req, res, next) => {
     res.send('Not authorized')
   } else {
     yellow('err', err)
-    res.status(500)
-    res.send('Internal server error zzzzzzzzzzzzzzzzzzzz')
+  res.status(500)
+  res.send('Internal server error zzzzzzzzzzzzzzzzzzzz')
   }
   
 }
