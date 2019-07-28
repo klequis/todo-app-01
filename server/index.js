@@ -1,14 +1,16 @@
 import express from 'express'
 import morgan from 'morgan'
 import helmet from 'helmet'
-
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import config from '../config'
-
-// import todo from 'routes/todo-route'
 import todo from '../routes/todo-route'
+import debug from 'debug'
 import { yellow } from '../logger'
+
+
+const lServer = (debug)('server')
+
 
 const jwt = require('express-jwt')
 const jwksRsa = require('jwks-rsa')
@@ -65,7 +67,7 @@ app.use(error)
 
 if (!module.parent) {
   app.listen(config.port, () => {
-    console.log(`Events API is listening on port ${config.port}`)
+    lServer(`Events API is listening on port ${config.port}`)
   })
 }
 

@@ -9,6 +9,9 @@ import {
 import { check, validationResult } from 'express-validator'
 import { yellow, red } from '../logger'
 import { removeIdProp } from '../db/helpers'
+import debug from 'debug'
+
+const lTodoRoute = (debug)('todo-route')
 
 const router = express.Router()
 
@@ -69,6 +72,7 @@ router.post(
 )
 
 router.get('/', async (req, res) => {
+  lTodoRoute('hi from GET')
   try {
     const td1 = await find('todos')
     res.send(td1)
