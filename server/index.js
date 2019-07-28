@@ -40,6 +40,11 @@ const error = (err, req, res, next) => {
   res.send('Internal server error')
   }
   
+  // YOU NEED TO CALL next() SOMEWHERE
+  // maybe here
+  // maybe in each route
+
+
 }
 
 app.use(helmet())
