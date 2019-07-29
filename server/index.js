@@ -10,6 +10,7 @@ import { yellow } from '../logger'
 
 
 const lServer = (debug)('server')
+const lServerError = (debug)('server:ERROR')
 
 
 const jwt = require('express-jwt')
@@ -30,20 +31,38 @@ const checkJwt = jwt({
 const app = express()
 
 const error = (err, req, res, next) => {
-  if (err.name === 'UnauthorizedError') {
-    yellow('not authorized')
-    res.status(401)
-    res.send('Not authorized')
-  } else {
-    yellow('err', err)
-  res.status(500)
-  res.send('Internal server error')
-  }
+  lServerError(err.message)
+  let returnError = undefined
+  const msg = err.message.toLowerCase()
+  if (msg === 'no authorization token was found') {
+    returnError = {
+      status: 401,
+      message: 'Not authorized'
+    }
+  } else if (msg.includes('no document found')) {
+    returnError = {
+      status: 404,
+      message: 'Resource not found'
+    }
   
+  } else if (msg.includes('unknown route')) {
+    returnError = {
+      status: 400,
+      message: 'Bad request'
+    }
+  } else {
+    returnError = {
+      status: 500,
+      message: 'Internal server error'
+    }
+  }
+  res.status(returnError.status)
+  res.send(returnError.message)
   // YOU NEED TO CALL next() SOMEWHERE
   // maybe here
   // maybe in each route
-
+  // OK, try it here
+  next(err)
 
 }
 
@@ -65,7 +84,7 @@ app.use(checkJwt)
 app.use('/api/todo', todo)
 
 app.get('*', function(req, res) {
-  throw new Error('unknown route!')
+  throw new Error(`unknown route: ..${req.url}`)
 })
 
 app.use(error)
