@@ -10,16 +10,19 @@ import { check, validationResult } from 'express-validator'
 import { yellow, red } from '../logger'
 import { removeIdProp } from '../db/helpers'
 import debug from 'debug'
+import wrap from '../wrap'
 
 const lTodoRoute = (debug)('todo-route')
 
 const router = express.Router()
 
 const getError = error => {
-  yellow('getError: error', error)
+  yellow('getError: error', error.message)
   if (process.env.NODE_ENV !== 'production') {
     red('todo-route ERROR:', error.message)
   }
+  const msg = err.message
+  
   if (error.message.includes('No document found')) {
     return {
       status: 404,
@@ -71,16 +74,22 @@ router.post(
   }
 )
 
-router.get('/', async (req, res) => {
-  lTodoRoute('hi from GET')
-  try {
-    const td1 = await find('todos')
-    res.send(td1)
-  } catch (e) {
-    const err = getError(e)
-    res.status(err.status).send(err)
-  }
-})
+
+router.get('', wrap(async (req, res, next) => {
+  const td1 = await find('todos')
+  res.send(td1)
+}))
+
+// router.get('/', async (req, res) => {
+//   lTodoRoute('hi from GET')
+//   t => ry {
+//     const td1 = await find('todos')
+//     res.send(td1)
+//   } catch (e) {
+//     const err = getError(e)
+//     res.status(err.status).send(err)
+//   }
+// })
 
 /**
  * @param {string} id A valid MongoDB _id
