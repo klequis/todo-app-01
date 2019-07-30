@@ -39,40 +39,64 @@ const getError = error => {
   }
 }
 
-/*
-    - only intended to be used for new todos
-    - assumes only { title: string } is sent
-    - { completed: false } will be added to all new todos
- */
-router.post(
-  '/',
-  [
+
+const postValidator = [
     check('title')
       .isString()
       .withMessage('Title must be a string.'),
     check('title')
       .isLength({ min: 3 })
       .withMessage('Title must be at least 3 characters long.')
-  ],
-  async (req, res) => {
-    try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
-      }
-      const td1 = req.body
-      const td2 = {
-        title: td1.title,
-        completed: false
-      }
-      const inserted = await insertOne('todos', td2)
-      res.send(inserted)
-    } catch (e) {
-      const err = getError(e)
-      res.status(err.status).send(err)
+  ]
+
+router.post('/',
+  postValidator,
+  wrap(async (req, res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
     }
+    const td1 = req.body
+    const td2 = {
+      title: td1.title,
+      completed: false
+    }
+    const inserted = await insertOne('todos', td2)
+    res.send(inserted)
   }
-)
+))
+
+// Original
+// 
+// router.post(
+//   '/',
+//   [
+//     check('title')
+//       .isString()
+//       .withMessage('Title must be a string.'),
+//     check('title')
+//       .isLength({ min: 3 })
+//       .withMessage('Title must be at least 3 characters long.')
+//   ],
+//   async (req, res) => {
+//     try {
+//       const errors = validationResult(req)
+//       if (!errors.isEmpty()) {
+//         return res.status(422).json({ errors: errors.array() })
+//       }
+//       const td1 = req.body
+//       const td2 = {
+//         title: td1.title,
+//         completed: false
+//       }
+//       const inserted = await insertOne('todos', td2)
+//       res.send(inserted)
+//     } catch (e) {
+//       const err = getError(e)
+//       res.status(err.status).send(err)
+//     }
+//   }
+// )
 
 
 router.get('', wrap(async (req, res, next) => {
