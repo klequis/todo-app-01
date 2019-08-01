@@ -58,11 +58,9 @@ const error = (err, req, res, next) => {
   }
   res.status(returnError.status)
   res.send(returnError.message)
-  // YOU NEED TO CALL next() SOMEWHERE
-  // maybe here
-  // maybe in each route
-  // OK, try it here
-  next(err)
+  
+  // Do I really need to call next here?
+  // next(err)
 
 }
 
