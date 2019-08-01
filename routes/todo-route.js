@@ -6,7 +6,7 @@ import {
   findOneAndDelete,
   findOneAndUpdate
 } from '../db'
-import { check, validationResult } from 'express-validator'
+import { check, validationResult, checkSchema } from 'express-validator'
 import { yellow, red } from '../logger'
 import { removeIdProp } from '../db/helpers'
 import debug from 'debug'
@@ -39,6 +39,19 @@ const getError = error => {
   }
 }
 
+const postValidationSchema = {
+  title: {
+    in: ['body'],
+    isString: {
+      errorMessage: 'SERVER: Title must be a string.',  
+    },
+    
+    isLength: {
+      errorMessage: 'SERVER: Title must be at least 3 characters long.',
+      options: { min: 3 }
+    }
+  }
+}
 
 const postValidator = [
     check('title')
@@ -50,11 +63,12 @@ const postValidator = [
   ]
 
 router.post('/',
-  postValidator,
+  checkSchema(postValidationSchema),
   wrap(async (req, res) => {
     const errors = validationResult(req)
+    yellow('errors', errors.array())
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
+      return res.status(422).json({errors: errors.array()})
     }
     const td1 = req.body
     const td2 = {
