@@ -8,13 +8,16 @@ import { fourTodos } from './routes/todo/fixture'
 const collectionName = 'todos'
 
 describe('test getToken()', function() {
+
   let token
+
   before(async function() {
     token = await getToken()
     await dropCollection(collectionName)
     await insertMany(collectionName, fourTodos)
     // console.log('token', token)
   })
+  
   it('should have keys: access_token, expires_in, token_type ', function() {
     const keys = Object.keys(token)
     console.log(keys)
