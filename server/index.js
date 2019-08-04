@@ -6,8 +6,7 @@ import cors from 'cors'
 import config from '../config'
 import todo from '../routes/todo-route'
 import debug from 'debug'
-import { yellow } from '../logger'
-
+import { yellow, redf } from '../logger'
 
 const lServer = (debug)('server')
 const lServerError = (debug)('server:ERROR')
@@ -30,46 +29,12 @@ const checkJwt = jwt({
 
 const app = express()
 
-const error = (err, req, res, next) => {
-  lServerError(err.message)
-  let returnError = undefined
-  const msg = err.message.toLowerCase()
-  if (msg === 'no authorization token was found') {
-    returnError = {
-      status: 401,
-      message: 'Not authorized'
-    }
-  } else if (msg.includes('no document found')) {
-    returnError = {
-      status: 404,
-      message: 'Resource not found'
-    }
-  
-  } else if (msg.includes('unknown route')) {
-    returnError = {
-      status: 400,
-      message: 'Bad request'
-    }
-  } else {
-    returnError = {
-      status: 500,
-      message: 'Internal server error'
-    }
-  }
-  res.status(returnError.status)
-  res.send(returnError.message)
-  
-  // Do I really need to call next here?
-  // next(err)
-
-}
-
 app.use(helmet())
 app.use(cors())
 app.use(bodyParser.json())
 app.use(morgan('dev'))
 
-app.get('/ping', async (req, res) => {
+app.get('/health', async (req, res) => {
   try {
     res.send(JSON.stringify({ status: 'All good here.' }))
   } catch (e) {
@@ -78,12 +43,43 @@ app.get('/ping', async (req, res) => {
   }
 })
 
+
+
 app.use(checkJwt)
+app.use((req, res, next) => {
+  res.header('Content-Type', 'application/json')
+  next()
+})
 app.use('/api/todo', todo)
 
 app.get('*', function(req, res) {
   throw new Error(`unknown route: ..${req.url}`)
 })
+
+const error = (err, req, res, next) => {
+
+  if (process.NODE_ENV === 'production') {
+    redf(err.message)
+  }
+
+  lServerError(err.message)
+  let status
+  const msg = err.message.toLowerCase()
+
+  if (msg === 'no authorization token was found') {
+      status = 401
+  } else if (msg.includes('no document found')) {
+      status = 404
+  } else if (msg.includes('unknown route')) {
+      status = 400
+  } else {
+      status = 500
+  }
+
+  res.status(returnError.status)
+  res.send()
+
+}
 
 app.use(error)
 
