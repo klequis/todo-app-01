@@ -21,13 +21,13 @@ const getError = error => {
   if (process.env.NODE_ENV !== 'production') {
     red('todo-route ERROR:', error.message)
   }
-  const msg = err.message
+  // const msg = err.message
   
   if (error.message.includes('No document found')) {
     return {
       status: 404,
       type: 'Bad request',
-      message: 'resource not found',
+      message: 'Resource not found',
       errors: []
     }
   }
@@ -43,30 +43,29 @@ const postValidationSchema = {
   title: {
     in: ['body'],
     isString: {
-      errorMessage: 'SERVER: Title must be a string.',  
+      errorMessage: 'Title must be a string.',  
     },
     
     isLength: {
-      errorMessage: 'SERVER: Title must be at least 3 characters long.',
+      errorMessage: 'Title must be at least 3 characters long.',
       options: { min: 3 }
     }
   }
 }
 
-const postValidator = [
-    check('title')
-      .isString()
-      .withMessage('Title must be a string.'),
-    check('title')
-      .isLength({ min: 3 })
-      .withMessage('Title must be at least 3 characters long.')
-  ]
+// const postValidator = [
+//     check('title')
+//       .isString()
+//       .withMessage('Title must be a string.'),
+//     check('title')
+//       .isLength({ min: 3 })
+//       .withMessage('Title must be at least 3 characters long.')
+//   ]
 
 router.post('/',
   checkSchema(postValidationSchema),
   wrap(async (req, res) => {
     const errors = validationResult(req)
-    yellow('errors', errors.array())
     if (!errors.isEmpty()) {
       return res.status(422).json({errors: errors.array()})
     }
@@ -128,6 +127,17 @@ router.get('', wrap(async (req, res, next) => {
 //     res.status(err.status).send(err)
 //   }
 // })
+
+
+const deleteValidationSchema = {
+  id: {
+    in: ['params'],
+    isMongoId: {
+      errorMessage: 'Parameter id must be a valid MongodDB hex string.'
+    },
+  }
+}
+
 
 /**
  * @param {string} id A valid MongoDB _id

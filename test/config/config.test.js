@@ -1,9 +1,10 @@
 import { expect } from 'chai'
 import { mongoUri, dbName, apiRoot } from 'config'
+import { yellow } from 'logger'
 
 describe('test config', function() {
   const testLocal = 'testLocal'
-  const dev = 'dev'
+  const development = 'development'
   // testLocal
   it('test mongoUri(testLocal) - should return true', function() {
     const mongoUriRegEx = /mongodb:\/\/testUser:.*@localhost:27017\/todo-test/g
@@ -15,16 +16,16 @@ describe('test config', function() {
   it('test apiRoot(testLocal)', function() {
     expect(apiRoot(testLocal)).to.equal('https://api.klequis-todo.tk')
   })
-  // dev
-  it('test mongoUri(dev) - should return true', function() {
+  // development
+  it('test mongoUri(development) - should return true', function() {
     const mongoUriRegEx = /mongodb:\/\/devUser:.*@localhost:27017\/todo-dev/g
-    expect(mongoUriRegEx.test(mongoUri(dev))).to.equal(true)
+    expect(mongoUriRegEx.test(mongoUri(development))).to.equal(true)
   })
-  it('test dbName(dev)', function() {
-    expect(dbName(dev)).to.equal('todo-dev')
+  it('test dbName(development)', function() {
+    expect(dbName(development)).to.equal('todo-dev')
   })
-  it('test apiRoot(dev)', function() {
-    expect(apiRoot(dev)).to.equal('https://api.klequis-todo.tk')
+  it('test apiRoot(development)', function() {
+    expect(apiRoot(development)).to.equal('https://api.klequis-todo.tk')
   })
   // testRemote - no tests
   // prod - no tests
