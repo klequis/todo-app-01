@@ -6,26 +6,33 @@ import {
   dropCollection,
   insertMany,
 } from 'db'
-
-import { green } from 'logger'
+import getToken from 'test/get-token'
+import { yellow } from 'logger'
 
 const collectionName = 'todos'
 
 describe('todo-route GET', function() {
+
+  let token = undefined
+
+  before(async function() {
+    token = await getToken()
+  })
+
   describe('test GET /api/todo', function() {
     before(async function() {
       await dropCollection(collectionName)
       await insertMany(collectionName, fourTodos)
     })
     it('should return 4 todos', async function() {
-      const get = await request(app)
+      const r = await request(app)
         .get('/api/todo')
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send()
         .expect('Content-Type', /json/)
         .expect(200)
-      const data = get.body
-      expect(data.length).to.equal(4)
+      expect(r.body.length).to.equal(4)
     })
   })
 
@@ -33,17 +40,17 @@ describe('todo-route GET', function() {
     let _idToGet = ''
     before(async function() {
       await dropCollection(collectionName)
-      const insert = await insertMany(collectionName, fourTodos)
-      // green('insert', insert)
-      _idToGet = insert[1]._id.toString()
-      // green('_idToGet', _idToGet)
+      const r = await insertMany(collectionName, fourTodos)
+      _idToGet = r[1]._id.toString()
     })
-    it('should get todo with specified _id', async function() {
-      const get = await request(app)
+    it.only('should get todo with specified _id', async function() {
+      const r = await request(app)
         .get(`/api/todo/${_idToGet}`)
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send()
-      // expect(get.body.data[0]._id.toString()).to.equal(_idToGet)
+      expect(r.body[0]._id.toString()).to.equal(_idToGet)
     })
   })
+
 })
