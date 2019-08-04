@@ -43,7 +43,7 @@ describe('todo-route GET', function() {
       const r = await insertMany(collectionName, fourTodos)
       _idToGet = r[1]._id.toString()
     })
-    it.only('should get todo with specified _id', async function() {
+    it('should get todo with specified _id', async function() {
       const r = await request(app)
         .get(`/api/todo/${_idToGet}`)
         .set('Accept', 'application/json')
