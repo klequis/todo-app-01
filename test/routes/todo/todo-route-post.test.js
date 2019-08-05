@@ -4,6 +4,7 @@ import { equals } from 'ramda'
 import { fourTodos, oneTodo } from './fixture'
 import app from 'server'
 import { close, dropCollection, find } from 'db'
+import getToken from 'test/get-token'
 
 // eslint-disable-next-line
 import { logResponse, yellow } from 'logger'
@@ -23,6 +24,13 @@ const titleLenErr = {
 }
 
 describe('todo-route POST', function() {
+
+  let token = undefined
+
+  before(async function() {
+    token = await getToken()
+  })
+
   describe('test POST /api/todo', function() {
     before(async function() {
       await dropCollection(collectionName)
@@ -31,6 +39,7 @@ describe('todo-route POST', function() {
       const r = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send(oneTodo)
         .expect('Content-Type', /json/)
         .expect(200)
@@ -45,6 +54,7 @@ describe('todo-route POST', function() {
       const r = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send()
       const { errors } = r.body
       expect(errors.length).to.equal(2)
@@ -55,6 +65,7 @@ describe('todo-route POST', function() {
       const r = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send('')
       const { errors } = r.body
       expect(errors.length).to.equal(2)
@@ -65,6 +76,7 @@ describe('todo-route POST', function() {
       const r = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send('a')
       const { errors } = r.body
       expect(errors.length).to.equal(2)
@@ -75,6 +87,7 @@ describe('todo-route POST', function() {
       const r = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send({})
       const { errors } = r.body
       expect(errors.length).to.equal(2)
@@ -85,6 +98,7 @@ describe('todo-route POST', function() {
       const r = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send({ title: 'a' })
       const { errors } = r.body
       expect(errors.length).to.equal(1)
@@ -94,6 +108,7 @@ describe('todo-route POST', function() {
       const r = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send({ title: 123 })
       const { errors } = r.body
       expect(errors[0].msg).to.equal(titleTypeErr.msg)
@@ -102,6 +117,7 @@ describe('todo-route POST', function() {
       const r = await request(app)
         .post('/api/todo')
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send({ title: '123' })
       const { body } = r
       const data = body[0]
