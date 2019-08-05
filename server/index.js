@@ -6,8 +6,13 @@ import cors from 'cors'
 import config from '../config'
 import todo from '../routes/todo-route'
 import debug from 'debug'
-import { yellow, redf } from '../logger'
+import { redf } from '../logger'
 
+
+// debug
+// debug is not working in 'testLocal'. Maybe take this code out
+// debug.enable('testLocal')
+// console.log(2, debug.enabled('testLocal'))
 const lServer = (debug)('server')
 const lServerError = (debug)('server:ERROR')
 
@@ -46,6 +51,7 @@ app.get('/health', async (req, res) => {
 
 
 app.use(checkJwt)
+
 app.use((req, res, next) => {
   res.header('Content-Type', 'application/json')
   next()
@@ -57,12 +63,11 @@ app.get('*', function(req, res) {
 })
 
 const error = (err, req, res, next) => {
-
-  if (process.NODE_ENV === 'production') {
-    redf(err.message)
+  if (process.env.NODE_ENV !== 'production') {
+    redf(err.message) // works in test
+    lServerError(err.message) // works only in dev
   }
-
-  lServerError(err.message)
+  
   let status
   const msg = err.message.toLowerCase()
 
@@ -76,7 +81,7 @@ const error = (err, req, res, next) => {
       status = 500
   }
 
-  res.status(returnError.status)
+  res.status(status)
   res.send()
 
 }
