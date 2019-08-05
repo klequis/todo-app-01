@@ -11,6 +11,9 @@ import { yellow } from 'logger'
 
 const collectionName = 'todos'
 
+const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
+const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
+
 describe('todo-route GET', function() {
 
   let token = undefined
@@ -50,6 +53,16 @@ describe('todo-route GET', function() {
         .set('Authorization', `Bearer ${token.access_token}`)
         .send()
       expect(r.body[0]._id.toString()).to.equal(_idToGet)
+    })
+    it('should get todo with specified _id', async function() {
+      const r = await request(app)
+        .get(`/api/todo/${invalidMongoId}`)
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
+        .send()
+        .expect(422)
+      const { errors } = r.body
+      expect(errors[0].msg).to.equal(invalidMongoIdMsg)
     })
   })
 
