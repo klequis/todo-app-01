@@ -6,6 +6,7 @@ import {
   dropCollection,
   insertMany,
 } from 'db'
+import getToken from 'test/get-token'
 
 // eslint-disable-next-line
 import { logResponse, yellow } from 'logger'
@@ -14,6 +15,11 @@ const collectionName = 'todos'
 
 
 describe('todo-route', function() {
+  let token = undefined
+
+  before(async function() {
+    token = await getToken()
+  })
   describe('test PATCH /api/todo/:id', function() {
     let idToUpdate1
     let idToUpdate2
@@ -29,6 +35,7 @@ describe('todo-route', function() {
       const r = await request(app)
         .patch(`/api/todo`)
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send(newData)
       const data = r.body[0]
       expect(data.title).to.equal(newData.title)
@@ -39,6 +46,7 @@ describe('todo-route', function() {
       const r = await request(app)
         .patch(`/api/todo`)
         .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token.access_token}`)
         .send(newData)
       const data = r.body[0]
       expect(data.title).to.equal(newData.title)
