@@ -1,6 +1,7 @@
 import mongodb, { ObjectID } from 'mongodb'
 import { removeIdProp } from './helpers'
 import config from '../config'
+import { yellow } from '../logger';
 
 const MongoClient = mongodb.MongoClient
 
@@ -25,21 +26,6 @@ export const close = async () => {
   }
   client = undefined
 }
-
-// const formatReturnSuccess = data => {
-//   return { data: data, error: null }
-// }
-
-// const formatReturnError = (functionName, error) => {
-//   logError(functionName, error)
-//   return { data: null, error: error.message }
-// }
-
-// const logError = (functionName, error) => {
-//   if (config.env !== 'production') {
-//     console.error(`Error: dbFunctions.${functionName}`, error)
-//   }
-// }
 
 /**
  *
@@ -151,6 +137,7 @@ export const findById = async (collection, id, project = {}) => {
 export const findOneAndDelete = async (collection, id) => {
   try {
     const { db } = await connectDB()
+    
     const r = await db
       .collection(collection)
       .findOneAndDelete({ _id: ObjectID(id) })
@@ -161,7 +148,7 @@ export const findOneAndDelete = async (collection, id) => {
     }
     return [r.value]
   } catch (e) {
-    throw new Error(e.message)
+    throw e
   }
 }
 
