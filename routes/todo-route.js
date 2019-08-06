@@ -7,10 +7,22 @@ import {
   findOneAndUpdate
 } from '../db'
 import { check, validationResult, checkSchema } from 'express-validator'
-import { redf, yellow } from '../logger'
+import { redf } from '../logger'
 import { removeIdProp } from '../db/helpers'
 import wrap from '../wrap'
+import { pick } from 'ramda'
 
+/**
+ * 
+ * @description filter out any undesired fields
+ * 
+ * @param {object} todo 
+ * 
+ * @returns {object} a todo { _id, title, completed }
+ */
+const filterFields = todo => {
+  return pick(['_id', 'title', 'completed'], todo)
+}
 
 const router = express.Router()
 
@@ -28,6 +40,11 @@ const postValidationSchema = {
   }
 }
 
+/**
+ * @param {string} title the title of the todo
+ * 
+ * @returns {object} [{ _id, title, completed }] an array of one todo
+ */
 router.post(
   '/',
   checkSchema(postValidationSchema),
@@ -37,15 +54,22 @@ router.post(
       return res.status(422).json({ errors: errors.array() })
     }
     const td1 = req.body
-    const td2 = {
-      title: td1.title,
+    const td2 = filterFields(td1)
+    const { title } = td2
+    // Select title and add completed
+    const td3 = {
+      title: title,
       completed: false
     }
-    const inserted = await insertOne('todos', td2)
+
+    const inserted = await insertOne('todos', td3)
     res.send(inserted)
   })
 )
 
+/**
+ * @returns {object} [{ _id, title, completed }] and array of all todos
+ */
 router.get(
   '',
   wrap(async (req, res, next) => {
@@ -64,8 +88,9 @@ const deleteValidationSchema = {
 }
 
 /**
- * @param {string} id A valid MongoDB _id
- *
+ * @param {string} _id A valid MongoDB object id
+ * 
+ * @returns {object} the deleted todo
  */
 
 router.delete(
@@ -91,6 +116,11 @@ const getByIdValidationSchema = {
   }
 }
 
+/**
+ * @param {string} _id a valid MongoDB object id
+ * 
+ * @return {object} 1 todo
+ */
 router.get(
   '/:id',
   checkSchema(getByIdValidationSchema),
@@ -105,14 +135,21 @@ router.get(
   })
 )
 
+/**
+ * @param {object} todo a complete todo { _id, title, completed }
+ * 
+ * @returns {object} [{ _id, title, completed }] an array of one todo
+ */
+
 router.patch(
   '/',
   wrap(async (req, res) => {
     const t1 = req.body
-    const id = t1._id
-    const t2 = removeIdProp(t1)
-    const u = await findOneAndUpdate('todos', id, t2)
-    res.send(u)
+    const t2 = filterFields(t1)
+    const { _id } = t2
+    const t3 = removeIdProp(t2)
+    const r = await findOneAndUpdate('todos', _id, t3)
+    res.send(r)
   })
 )
 
