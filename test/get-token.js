@@ -2,10 +2,11 @@ import request from 'request'
 import config from 'config'
 
 const getToken = () => {
-  const tokenEndpoint = config.auth0.getTokenEndpoint
-  const clientId = config.auth0.clientId
-  const clientSecret = config.auth0.clientSecret
-  const appIdentifier = config.auth0.apiIdentifier
+  const cfg = config()
+  const tokenEndpoint = cfg.auth0.getTokenEndpoint
+  const clientId = cfg.auth0.clientId
+  const clientSecret = cfg.auth0.clientSecret
+  const appIdentifier = cfg.auth0.apiIdentifier
   
   return new Promise((resolve, reject) => {
 
