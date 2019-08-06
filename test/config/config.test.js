@@ -6,6 +6,10 @@ import settings from '../../config/config.settings'
 const environments = [TEST_LOCAL, TEST_REMOTE, DEV, PROD]
 
 describe('test config', function() {
+  const startNodeEnv = process.env.NODE_ENV
+  after(function() {
+    config(startNodeEnv)
+  })
   environments.forEach(env => {
     let cfg
     before(function() {
