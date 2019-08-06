@@ -1,32 +1,63 @@
 import { expect } from 'chai'
-import { mongoUri, dbName, apiRoot } from 'config'
 import { yellow } from 'logger'
+import { TEST_LOCAL, TEST_REMOTE, DEV, PROD } from 'config'
+import config from 'config'
+import settings from '../../config/config.settings'
+
+const environments = [TEST_LOCAL, TEST_REMOTE, DEV, PROD]
 
 describe('test config', function() {
-  const testLocal = 'testLocal'
-  const development = 'development'
-  // testLocal
-  it('test mongoUri(testLocal) - should return true', function() {
-    const mongoUriRegEx = /mongodb:\/\/testUser:.*@localhost:27017\/todo-test/g
-    expect(mongoUriRegEx.test(mongoUri(testLocal))).to.equal(true)
+  environments.forEach(env => {
+    let cfg
+    before(function() {
+      // yellow('sending', env)
+      cfg = config(env)
+    })
+    describe(`test config for ${env}`, function() {
+
+      it('should return apiRoot', function() {
+        if (env in[TEST_LOCAL, DEV, TEST_LOCAL]) {
+          expect(cfg.apiRoot).to.equal(settings.apiRoot.local)
+        }
+        if (env === PROD) {
+          expect(cfg.apiRoot).to.equal(settings.apiRoot.remote)
+        }
+      })
+
+      it('should return 7', function() {
+        // decided to only do this test to auth0 data to keep
+        // data concealed.
+        // Isn't env dependent but should be the same in each environment
+        expect(Object.keys(cfg.auth0).length).to.equal(7)
+      })  
+
+      it('should = production', function() {
+        expect(cfg.env).to.equal(env)
+      })
+
+      it('should return server port', function() {
+        if (env in [TEST_LOCAL, DEV, TEST_LOCAL]) {
+          expect(cfg.port).to.equal(settings.serverPort.local)
+        }
+        if (env === PROD) {
+          expect(cfg.port).to.equal(settings.serverPort.remote)
+        }
+      })
+
+      
+
+    })
+
+
   })
-  it('test dbName(testLocal)', function() {
-    expect(dbName(testLocal)).to.equal('todo-test')
+
+  describe('config should throw', function() {
+    it('should throw', function() {
+      expect(() => config('junk')).to.throw()
+    })
   })
-  it('test apiRoot(testLocal)', function() {
-    expect(apiRoot(testLocal)).to.equal('https://api.klequis-todo.tk')
-  })
-  // development
-  it('test mongoUri(development) - should return true', function() {
-    const mongoUriRegEx = /mongodb:\/\/devUser:.*@localhost:27017\/todo-dev/g
-    expect(mongoUriRegEx.test(mongoUri(development))).to.equal(true)
-  })
-  it('test dbName(development)', function() {
-    expect(dbName(development)).to.equal('todo-dev')
-  })
-  it('test apiRoot(development)', function() {
-    expect(apiRoot(development)).to.equal('https://api.klequis-todo.tk')
-  })
-  // testRemote - no tests
-  // prod - no tests
+
+  
+  
+
 })
