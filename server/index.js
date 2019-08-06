@@ -16,6 +16,7 @@ import { redf } from '../logger'
 const lServer = (debug)('server')
 const lServerError = (debug)('server:ERROR')
 
+const cfg = config()
 
 const jwt = require('express-jwt')
 const jwksRsa = require('jwks-rsa')
@@ -25,11 +26,11 @@ const checkJwt = jwt({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: config.auth0.jwksUri
+    jwksUri: cfg.auth0.jwksUri
   }),
-  audience: config.auth0.apiIdentifier,
-  issuer: config.auth0.auth0Domain,
-  algorithm: config.auth0.algorithm
+  audience: cfg.auth0.apiIdentifier,
+  issuer: cfg.auth0.auth0Domain,
+  algorithm: cfg.auth0.algorithm
 })
 
 const app = express()
@@ -89,8 +90,8 @@ const error = (err, req, res, next) => {
 app.use(error)
 
 if (!module.parent) {
-  app.listen(config.port, () => {
-    lServer(`Events API is listening on port ${config.port}`)
+  app.listen(cfg.port, () => {
+    lServer(`Events API is listening on port ${cfg.port}`)
   })
 }
 
