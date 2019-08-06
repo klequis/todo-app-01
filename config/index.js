@@ -1,17 +1,18 @@
 // settings are in keybase
 
 import settings from './config.settings'
-import { bluef } from '../logger'
+import { bluef, yellow } from '../logger'
+import { prototype } from 'mocha';
 
-const TEST_LOCAL = 'testLocal'
-const TEST_REMOTE = 'testRemote'
-const DEV = 'development'
-const PROD = 'production'
+export const TEST_LOCAL = 'testLocal'
+export const TEST_REMOTE = 'testRemote'
+export const DEV = 'development'
+export const PROD = 'production'
 
+const unknowEnvName = env =>
+  `ERROR: config/index.js: unknown environment name: ${env}. Must be ${TEST_LOCAL}, ${TEST_REMOTE}, ${DEV} or ${PROD}`
 
-const unknowEnvName = (env) => `ERROR: config/index.js: unknown environment name: ${env}. Must be ${TEST_LOCAL}, ${TEST_REMOTE}, ${DEV} or ${PROD}`
-
-export const mongoUri = env => {
+const mongoUri = env => {
   switch (env) {
     case TEST_LOCAL:
       bluef('env: ', env)
@@ -32,7 +33,7 @@ export const mongoUri = env => {
   }
 }
 
-export const dbName = env => {
+const dbName = env => {
   switch (env) {
     case TEST_LOCAL:
       return settings.dbName.test
@@ -47,9 +48,9 @@ export const dbName = env => {
   }
 }
 
-export const apiRoot = (env)  => {
-  bluef('apiRoot: env', env);
-  
+const apiRoot = env => {
+  // bluef('apiRoot: env', env)
+
   switch (env) {
     case TEST_LOCAL:
     case DEV:
@@ -62,12 +63,50 @@ export const apiRoot = (env)  => {
   }
 }
 
+const port = env => {
+  switch (env) {
+    case TEST_LOCAL:
+    case DEV:
+      return settings.serverPort.local
+    case TEST_REMOTE:
+    case PROD:
+      return settings.serverPort.remote
+    default:
+      throw new Error(unknowEnvName())
+  }
+}
 
-export default {
-  mongoUri: mongoUri(process.env.NODE_ENV),
-  dbName: dbName(process.env.NODE_ENV),
-  apiRoot: apiRoot(process.env.NODE_ENV),
-  port: 3030,
-  env: process.env.NODE_ENV,
-  auth0: settings.auth0
-};
+
+const config = env => {
+  const _env = env || process.env.NODE_ENV
+  yellow('_env', _env)
+  const envExists = [TEST_LOCAL, DEV, TEST_REMOTE, PROD].findIndex(i => i === _env)
+  
+  // yellow('exists?', a >=0 ? 'yes' : 'no')
+  // yellow('a', a)
+  
+  // console.log('********')
+  if (!(envExists >=0)) {
+    throw new Error(unknowEnvName())
+  }
+  
+  return {
+    port: port(_env),
+    apiRoot: apiRoot(_env),
+    auth0: settings.auth0,
+    env: _env,
+    dbName: dbName(_env),
+    mongoUri: mongoUri(_env)
+  }
+}
+
+export default config
+
+// export default {
+//   mongoUri: mongoUri(process.env.NODE_ENV),
+//   dbName: dbName(process.env.NODE_ENV),
+//   apiRoot: apiRoot(process.env.NODE_ENV),
+//   port: 3030,
+//   env: process.env.NODE_ENV,
+//   auth0: settings.auth0
+// };
