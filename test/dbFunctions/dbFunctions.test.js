@@ -1,4 +1,4 @@
-import chai from 'chai'
+import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { fourTodos } from './fixture'
 import {
@@ -15,14 +15,12 @@ import {
 import { yellow } from 'logger'
 
 chai.use(chaiAsPromised)
-const expect = chai.expect
 
 const collectionName = 'todos'
 
 after(async () => {
   await close()
 })
-
 
 describe('dbFunctions failure cases', function() {
   it('should throw: collection name must be a String', async function() {
@@ -118,11 +116,7 @@ describe('dbFunctions success cases', function() {
       idToUpdate = ret[1]._id.toString()
     })
     it('findOneAndUpdate: should return updated document', async function() {
-      const ret = await findOneAndUpdate(
-        collectionName,
-        idToUpdate,
-        newData
-      )
+      const ret = await findOneAndUpdate(collectionName, idToUpdate, newData)
       expect(ret[0]._id.toString()).to.equal(idToUpdate)
       expect(ret[0].title).to.equal(newData.title)
       expect(ret[0].completed).to.equal(newData.completed)
