@@ -2,9 +2,6 @@ import { hasProp, isValidMongoStringId } from 'lib'
 
 import { expect } from 'chai'
 
-import { yellow } from 'logger'
-
-
 const validHexString = '5ce819935e539c343f141ece'
 
 describe('test lib', function() {
