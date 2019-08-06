@@ -6,9 +6,6 @@ import app from 'server'
 import { dropCollection } from 'db'
 import getToken from 'test/get-token'
 
-// eslint-disable-next-line
-import { logResponse, yellow } from 'logger'
-
 const collectionName = 'todos'
 
 const titleTypeErr = {

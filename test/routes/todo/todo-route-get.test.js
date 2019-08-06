@@ -7,7 +7,6 @@ import {
   insertMany,
 } from 'db'
 import getToken from 'test/get-token'
-import { yellow } from 'logger'
 
 const collectionName = 'todos'
 

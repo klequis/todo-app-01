@@ -5,9 +5,6 @@ import app from 'server'
 import { dropCollection, insertMany } from 'db'
 import getToken from 'test/get-token'
 
-// eslint-disable-next-line
-import { logResponse, yellow } from 'logger'
-
 const collectionName = 'todos'
 
 describe('todo-route', function() {

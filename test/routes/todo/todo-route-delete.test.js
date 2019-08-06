@@ -4,7 +4,6 @@ import { fourTodos, oneTodo } from './fixture'
 import app from 'server'
 import { dropCollection, find, insertMany } from 'db'
 import getToken from 'test/get-token'
-import { yellow } from '../../../logger';
 
 const collectionName = 'todos'
 
