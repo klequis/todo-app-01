@@ -82,7 +82,7 @@ const setNodeEnv = (env) => {
   } else if (process.env.NODE_ENV) {
     return process.env.NODE_ENV
   } else {
-    return prod
+    return PROD
   }
 }
 
