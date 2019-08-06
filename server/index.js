@@ -8,13 +8,12 @@ import todo from '../routes/todo-route'
 import debug from 'debug'
 import { redf } from '../logger'
 
-
 // debug
 // debug is not working in 'testLocal'. Maybe take this code out
 // debug.enable('testLocal')
 // console.log(2, debug.enabled('testLocal'))
-const lServer = (debug)('server')
-const lServerError = (debug)('server:ERROR')
+const lServer = debug('server')
+const lServerError = debug('server:ERROR')
 
 const cfg = config()
 
@@ -49,8 +48,6 @@ app.get('/health', async (req, res) => {
   }
 })
 
-
-
 app.use(checkJwt)
 
 app.use((req, res, next) => {
@@ -68,23 +65,22 @@ const error = (err, req, res, next) => {
     redf(err.message) // works in test
     lServerError(err.message) // works only in dev
   }
-  
+
   let status
   const msg = err.message.toLowerCase()
 
   if (msg === 'no authorization token was found') {
-      status = 401
+    status = 401
   } else if (msg.includes('no document found')) {
-      status = 404
+    status = 404
   } else if (msg.includes('unknown route')) {
-      status = 400
+    status = 400
   } else {
-      status = 500
+    status = 500
   }
 
   res.status(status)
   res.send()
-
 }
 
 app.use(error)

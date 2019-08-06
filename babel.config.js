@@ -1,14 +1,9 @@
-module.exports = function (api) {
+module.exports = function(api) {
   api.cache(true)
 
-  const presets = ["@babel/preset-env"]
-  const plugins = [
-    "@babel/plugin-transform-runtime",
-    "istanbul"
-  ]
-  const ignore = [
-    'ecosystem.config.js'
-  ]
+  const presets = ['@babel/preset-env']
+  const plugins = ['@babel/plugin-transform-runtime', 'istanbul']
+  const ignore = ['ecosystem.config.js']
 
   return {
     presets,

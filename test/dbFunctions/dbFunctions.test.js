@@ -42,10 +42,7 @@ describe('dbFunctions success cases', function() {
   describe('test dropCollection', function() {
     before(async function() {
       await dropCollection(collectionName)
-      // await insertMany(collectionName, fourTodos)
     })
-    // In the event the collection to drop is not found, dropCollection()
-    // will return { data: true, error: null }
     it('should return true', async function() {
       const dc1 = await dropCollection(collectionName)
       expect(dc1).to.equal(true)

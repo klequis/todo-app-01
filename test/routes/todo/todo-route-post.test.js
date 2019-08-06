@@ -3,7 +3,7 @@ import request from 'supertest'
 import { equals } from 'ramda'
 import { fourTodos, oneTodo } from './fixture'
 import app from 'server'
-import { close, dropCollection, find } from 'db'
+import { dropCollection } from 'db'
 import getToken from 'test/get-token'
 
 // eslint-disable-next-line

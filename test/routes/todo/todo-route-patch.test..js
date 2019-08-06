@@ -2,17 +2,13 @@ import { expect } from 'chai'
 import request from 'supertest'
 import { fourTodos, oneTodo } from './fixture'
 import app from 'server'
-import {
-  dropCollection,
-  insertMany,
-} from 'db'
+import { dropCollection, insertMany } from 'db'
 import getToken from 'test/get-token'
 
 // eslint-disable-next-line
 import { logResponse, yellow } from 'logger'
 
 const collectionName = 'todos'
-
 
 describe('todo-route', function() {
   let token = undefined
@@ -30,7 +26,11 @@ describe('todo-route', function() {
       idToUpdate2 = inserted[2]._id.toString()
     })
     it('update title and completed should return document with updated title & completed', async function() {
-      const newData = { _id: idToUpdate1, title: 'changed title', completed: true }
+      const newData = {
+        _id: idToUpdate1,
+        title: 'changed title',
+        completed: true
+      }
 
       const r = await request(app)
         .patch(`/api/todo`)
@@ -54,26 +54,3 @@ describe('todo-route', function() {
     })
   })
 })
-
-
-/*
-.headers.text
-.request.Test.url
-.request.Test.url
-._data
-.req.ClientRequest.method
-.req.ClientRequest.path
-res.IncomingMessage.statusCode
-res.IncomingMessage.statusMessage
-res.IncomingMessage.text
-.text
-.body
-.headers
-.status
-.ok
-.clientError
-.serverError
-.error
-.type
-.charset
-*/
