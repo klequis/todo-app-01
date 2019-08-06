@@ -1,8 +1,7 @@
 // settings are in keybase
 
 import settings from './config.settings'
-import { bluef, yellow } from '../logger'
-import { prototype } from 'mocha';
+import { bluef } from 'logger'
 
 export const TEST_LOCAL = 'testLocal'
 export const TEST_REMOTE = 'testRemote'
@@ -49,8 +48,6 @@ const dbName = env => {
 }
 
 const apiRoot = env => {
-  // bluef('apiRoot: env', env)
-
   switch (env) {
     case TEST_LOCAL:
     case DEV:
@@ -76,20 +73,16 @@ const port = env => {
   }
 }
 
-
 const config = env => {
   const _env = env || process.env.NODE_ENV
-  yellow('_env', _env)
-  const envExists = [TEST_LOCAL, DEV, TEST_REMOTE, PROD].findIndex(i => i === _env)
-  
-  // yellow('exists?', a >=0 ? 'yes' : 'no')
-  // yellow('a', a)
-  
-  // console.log('********')
-  if (!(envExists >=0)) {
+  const envExists = [TEST_LOCAL, DEV, TEST_REMOTE, PROD].findIndex(
+    i => i === _env
+  )
+
+  if (!(envExists >= 0)) {
     throw new Error(unknowEnvName())
   }
-  
+
   return {
     port: port(_env),
     apiRoot: apiRoot(_env),
@@ -101,12 +94,3 @@ const config = env => {
 }
 
 export default config
-
-// export default {
-//   mongoUri: mongoUri(process.env.NODE_ENV),
-//   dbName: dbName(process.env.NODE_ENV),
-//   apiRoot: apiRoot(process.env.NODE_ENV),
-//   port: 3030,
-//   env: process.env.NODE_ENV,
-//   auth0: settings.auth0
-// };
