@@ -9,12 +9,13 @@ let client
 
 const connectDB = async () => {
   try {
+    const cfg = config()
     if (!client) {
-      client = await MongoClient.connect(config.mongoUri, {
+      client = await MongoClient.connect(cfg.mongoUri, {
         useNewUrlParser: true
       })
     }
-    return { db: client.db(config.dbName) }
+    return { db: client.db(cfg.dbName) }
   } catch (e) {
     throw new Error('Unable to connect to MongoDB')
   }
