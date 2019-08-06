@@ -1,7 +1,6 @@
 import mongodb, { ObjectID } from 'mongodb'
 import { removeIdProp } from './helpers'
 import config from '../config'
-import { yellow } from '../logger';
 
 const MongoClient = mongodb.MongoClient
 
