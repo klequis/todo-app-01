@@ -12,7 +12,6 @@ import {
   insertOne
 } from 'db'
 
-import { yellow } from 'logger'
 
 chai.use(chaiAsPromised)
 
