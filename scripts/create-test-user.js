@@ -2,7 +2,6 @@
 
 
 import mongodb, { ObjectID } from 'mongodb'
-// import { green, red } from '../logger'
 import chalk from 'chalk'
 
 const mongoUrl = 'mongodb://localhost:27017/todo-test'
