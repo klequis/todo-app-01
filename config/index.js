@@ -1,7 +1,7 @@
 // settings are in keybase
 
 import settings from './config.settings'
-import { bluef } from 'logger'
+import debug from 'debug'
 
 export const TEST_LOCAL = 'testLocal'
 export const TEST_REMOTE = 'testRemote'
@@ -11,19 +11,22 @@ export const PROD = 'production'
 const unknowEnvName = env =>
   `ERROR: config/index.js: unknown environment name: ${env}. Must be ${TEST_LOCAL}, ${TEST_REMOTE}, ${DEV} or ${PROD}`
 
+const lConfig = debug('server:config')
+
+
 const mongoUri = env => {
   switch (env) {
     case TEST_LOCAL:
-      bluef('env: ', env)
-      bluef('monguUri: ', settings.db.testLocal.mongoUri)
+      lConfig('env: ', env)
+      lConfig('monguUri: ', settings.db.testLocal.mongoUri)
       return settings.db.testLocal.mongoUri
     case TEST_REMOTE:
-      bluef('env: ', env)
-      bluef('monguUri: ', settings.db.testRemote.mongoUri)
+      lConfig('env: ', env)
+      lConfig('monguUri: ', settings.db.testRemote.mongoUri)
       return settings.db.testRemote.mongoUri
     case DEV:
-      bluef('env: ', env)
-      bluef('monguUri: ', settings.db.development.mongoUri)
+      lConfig('env: ', env)
+      lConfig('monguUri: ', settings.db.development.mongoUri)
       return settings.db.development.mongoUri
     case PROD:
       return settings.db.production.mongoUri
@@ -73,8 +76,18 @@ const port = env => {
   }
 }
 
+const setNodeEnv = (env) => {
+  if (env) {
+    return env
+  } else if (process.env.NODE_ENV) {
+    return process.env.NODE_ENV
+  } else {
+    return prod
+  }
+}
+
 const config = env => {
-  const _env = env || process.env.NODE_ENV
+  const _env = setNodeEnv(env)
   const envExists = [TEST_LOCAL, DEV, TEST_REMOTE, PROD].findIndex(
     i => i === _env
   )
