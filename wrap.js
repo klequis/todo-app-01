@@ -4,6 +4,7 @@ import { yellow, green } from 'logger'
 
 const wrap = fn => (...args) => fn(...args).catch(args[2])
 
+/* istanbul ignore next */
 const w1 = fn => (...args) => {
   // yellow('wrap called with args', args)
   yellow('fn', fn)
@@ -15,6 +16,7 @@ const w1 = fn => (...args) => {
   })
 }
 
+/* istanbul ignore next */
 const w2 = fn => (...args) =>
   fn(...args).catch(() => {
     green('length', args.length)
