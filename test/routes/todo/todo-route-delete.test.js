@@ -3,7 +3,6 @@ import { fourTodos, oneTodo } from './fixture'
 import { dropCollection, find, insertMany } from 'db'
 import getToken from 'test/get-token'
 import sendRequest from 'test/sendRequest'
-import { yellow } from '../../../logger';
 
 const collectionName = 'todos'
 
@@ -66,6 +65,5 @@ describe('test DELETE /api/todo/:id', function() {
       token
     })
     const { body } = r
-    yellow('body', body)
   })
 })
