@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=testLocal NODE_PATH=./ nyc mocha --require @babel/register",
+    "test": "NODE_ENV=testLocal NODE_PATH=./ mocha --require @babel/register",
+    "test-coverage": "NODE_ENV=testLocal NODE_PATH=./ nyc mocha --require @babel/register",
     "test-watch": "export WATCH='watch' && nodemon --exec 'npm test'",
     "start": "NODE_ENV=development NODE_PATH=./ nodemon --exec babel-node server/index.js",
     "start-dev": "DEBUG=server*,todo-route NODE_ENV=development NODE_PATH=./ nodemon --exec babel-node server/index.js",
