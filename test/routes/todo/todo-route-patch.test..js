@@ -4,8 +4,6 @@ import { dropCollection, insertMany } from 'db'
 import getToken from 'test/get-token'
 import sendRequest from 'test/sendRequest'
 import { yellow } from '../../../logger';
-import app from 'server'
-import request from 'supertest'
 
 const collectionName = 'todos'
 const patchUri = `/api/todo`
@@ -43,7 +41,7 @@ describe('todo-route', function() {
       expect(data.completed).to.equal(true)
     })
 
-    it.only('should return document with updated title only', async function() {
+    it('should return document with updated title only', async function() {
       const newData = { _id: idToUpdate2, title: 'another changed title' }
       const r = await sendRequest({
         method: 'PATCH',
