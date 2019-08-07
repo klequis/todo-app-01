@@ -1,15 +1,20 @@
 import { expect } from 'chai'
-import request from 'supertest'
 import { fourTodos, oneTodo } from './fixture'
-import app from 'server'
 import { dropCollection, find, insertMany } from 'db'
 import getToken from 'test/get-token'
+import sendRequest from 'test/sendRequest'
+import { yellow } from '../../../logger';
 
 const collectionName = 'todos'
 
 const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
 const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
 const idNotFound = '5cfbe5bf4bc4b4f726a14852' // this is a valid id but not in the db
+
+const deleteUri = value => {
+  const uri = `/api/todo/${value}`
+  return uri
+}
 
 describe('test DELETE /api/todo/:id', function() {
   let _idToDelete = ''
@@ -30,35 +35,37 @@ describe('test DELETE /api/todo/:id', function() {
   })
 
   it('should delete one record', async function() {
-    const r = await request(app)
-      .delete(`/api/todo/${_idToDelete}`)
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${token.access_token}`)
-      .send()
-      .expect(200)
+    const r = await sendRequest({
+      method: 'DELETE',
+      uri: deleteUri(_idToDelete),
+      status: 200,
+      body: {},
+      token
+    })
     const { body } = r
     expect(body[0].title).to.equal(fourTodos[1].title)
     expect(body[0].completed).to.equal(false)
   })
 
   it('should return invalid id', async function() {
-    const r = await request(app)
-      .delete(`/api/todo/${invalidMongoId}`)
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${token.access_token}`)
-      .send()
-      .expect(422)
+    const r = await sendRequest({
+      method: 'DELETE',
+      uri: deleteUri(invalidMongoId),
+      status: 422,
+      token
+    })
     const { errors } = r.body
     expect(errors[0].msg).to.equal(invalidMongoIdMsg)
   })
 
   it('should return id not found', async function() {
-    const r = await request(app)
-      .delete(`/api/todo/${idNotFound}`)
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${token.access_token}`)
-      .send()
-      .expect(404)
-    // console.log('r**', r)
+    const r = await sendRequest({
+      method: 'DELETE',
+      uri: deleteUri(idNotFound),
+      status: 404,
+      token
+    })
+    const { body } = r
+    yellow('body', body)
   })
 })
