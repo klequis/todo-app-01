@@ -11,7 +11,7 @@ const collectionName = 'todos'
 const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
 const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
 
-const getUri = (value) => `/api/todo/${value}`
+const getUri = (value) => `/api/todo/${value || ''}`
 
 
 describe('todo-route GET', function() {
