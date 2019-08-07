@@ -6,8 +6,7 @@ import {
   findOneAndDelete,
   findOneAndUpdate
 } from '../db'
-import { check, validationResult, checkSchema } from 'express-validator'
-import { redf } from '../logger'
+import { validationResult, checkSchema } from 'express-validator'
 import { removeIdProp } from '../db/helpers'
 import wrap from '../wrap'
 import { pick } from 'ramda'
