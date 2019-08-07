@@ -1,23 +1,21 @@
 import app from 'server'
 import request from 'supertest'
-import { green } from 'logger'
-import { yellow } from '../logger';
 
 const invalidMethodErrMsg = receivedMethod => {
   return `'method' must be one of ['post', 'delete', 'get', 'patch']. Received ${receivedMethod}`
 }
 
 const sendRequest = async ({ method = '', uri = '', status, body, token }) => {
-  green('method', method)
-  green('uri', uri)
-  green('status', status)
-  green('body', body)
-  green('token', token)
+  // green('method', method)
+  // green('uri', uri)
+  // green('status', status)
+  // green('body', body)
+  // green('token', token)
 
   const methodToLower = method.toLowerCase()
 
   const validMethod = ['post', 'delete', 'get', 'patch'].includes(methodToLower)
-  green('valid method', validMethod)
+  // green('valid method', validMethod)
   if (!validMethod) {
     throw new Error(invalidMethodErrMsg(method))
   }
