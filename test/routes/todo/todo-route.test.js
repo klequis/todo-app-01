@@ -1,10 +1,8 @@
 import { expect } from 'chai'
-import request from 'supertest'
-import app from 'server'
+import sendRequest from 'test/sendRequest'
 import {
   close,
 } from 'db'
-
 import getToken from 'test/get-token'
 
 after(async () => {
@@ -17,13 +15,13 @@ describe('todo-route', function() {
     token = await getToken()
   })
   describe('unknown endpoint', function() {
-    it('should return 404 & unknown endpoint', async () => {
-      const r = await request(app)
-        .get('/api/unknown')
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token.access_token}`)
-        .send()
-      expect(404)
+    it('NEW: should return 400 & unknown endpoint', async () => {
+      const r = await sendRequest({
+        method: 'GET',
+        uri: '/api/unknown',
+        status: 400,
+        token,
+      })
     })
   })
 })
