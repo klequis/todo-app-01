@@ -21,7 +21,7 @@ import { pick } from 'ramda'
  * @returns {object} a todo { _id, title, completed }
  */
 const filterFields = todo => {
-  return pick(['_id', 'title', 'completed'], todo)
+  return pick(['email', '_id', 'title', 'completed'], todo)
 }
 
 const router = express.Router()
@@ -29,19 +29,22 @@ const router = express.Router()
 const postValidationSchema = {
   title: {
     in: ['body'],
-    isString: {
-      errorMessage: 'Title must be a string.'
-    },
-
     isLength: {
       errorMessage: 'Title must be at least 3 characters long.',
       options: { min: 3 }
+    }
+  },
+  email: {
+    in: ['body'],
+    isEmail: {
+      errorMessage: 'Invalid or missing email.'
     }
   }
 }
 
 /**
  * @param {string} title the title of the todo
+ * @param {string} email a valid email address
  * 
  * @returns {object} [{ _id, title, completed }] an array of one todo
  */
@@ -54,15 +57,17 @@ router.post(
       return res.status(422).json({ errors: errors.array() })
     }
     const td1 = req.body
-    const td2 = filterFields(td1)
-    const { title } = td2
-    // Select title and add completed
-    const td3 = {
+    // const td2 = filterFields(td1)
+    
+    const { email, title } = td1
+
+    const td2 = {
+      email: email,
       title: title,
       completed: false
     }
 
-    const inserted = await insertOne('todos', td3)
+    const inserted = await insertOne('todos', td2)
     res.send(inserted)
   })
 )
