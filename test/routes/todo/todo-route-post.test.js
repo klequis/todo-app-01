@@ -1,5 +1,4 @@
 import { expect } from 'chai'
-import request from 'supertest'
 import { equals } from 'ramda'
 import {
   goodTodo,
@@ -11,7 +10,6 @@ import {
   codeTitleTodo,
   emptyTitleTodo
 } from './fixture'
-import app from 'server'
 import { dropCollection } from 'db'
 import getToken from 'test/get-token'
 import sendRequest from 'test/sendRequest'
