@@ -1,9 +1,8 @@
-import request from 'supertest'
 import { expect } from 'chai'
 import getToken from './get-token'
-import app from 'server'
 import { dropCollection, insertMany } from 'db'
 import { fourTodos } from './routes/todo/fixture'
+import sendRequest from 'test/sendRequest'
 
 const collectionName = 'todos'
 
@@ -26,15 +25,13 @@ describe('test getToken()', function() {
   })
 
   it('should return 4 todos', async function() {
-    const get = await request(app)
-      .get('/api/todo')
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${token.access_token}`)
-
-      .send()
-      .expect('Content-Type', /json/)
-      .expect(200)
-    const data = get.body
+    const r = await sendRequest({
+      method: 'GET',
+      uri: '/api/todo',
+      status: 200,
+      token
+    })
+    const data = r.body
     expect(data.length).to.equal(4)
   })
 })
