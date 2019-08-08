@@ -3,7 +3,6 @@ import { fourTodos, oneTodo } from './fixture'
 import { dropCollection, insertMany } from 'db'
 import getToken from 'test/get-token'
 import sendRequest from 'test/sendRequest'
-import { yellow } from '../../../logger';
 
 const collectionName = 'todos'
 const patchUri = `/api/todo`
