@@ -11,16 +11,39 @@ import { removeIdProp } from '../db/helpers'
 import wrap from '../wrap'
 import { pick } from 'ramda'
 
+import { yellow } from 'logger'
+
 /**
- * 
+ *
  * @description filter out any undesired fields
- * 
- * @param {object} todo 
- * 
- * @returns {object} a todo { _id, title, completed }
+ * @description user_id is aka 'sub' in date returned from Auth0
+ *
+ * @param {object} todo { user_id, title }
+ *
+ * @returns {object} a todo { _id, user_id, completed, title }
+ *
  */
 const filterFields = todo => {
   return pick(['email', '_id', 'title', 'completed'], todo)
+}
+
+const parseAuth0UserId = userId => {
+  const a = userId.split('|')
+  return a[1]
+}
+
+const isHexString = hexId => {
+  const checkForHexString = new RegExp('^[0-9a-fA-F]{24}$')
+  if (!hexId) {
+    return false
+  }
+  return checkForHexString.test(hexId)
+}
+
+const checkAuth0UserId = userId => {
+  // e.g., "auth0|5d1c...7"
+  const id = parseAuth0UserId(userId)
+  return isHexString(id)
 }
 
 const router = express.Router()
@@ -33,10 +56,24 @@ const postValidationSchema = {
       options: { min: 3 }
     }
   },
-  email: {
-    in: ['body'],
-    isEmail: {
-      errorMessage: 'Invalid or missing email.'
+  // user_id: {
+  //   in: ['body'],
+  //   isEmail: {
+  //     errorMessage: 'Invalid or missing email.'
+  //   }
+  // }
+  user_id: {
+    custom: {
+      options: (value, {req, location, path }) => {
+        // TODO: Show this logging in the book 
+        // yellow(
+        //   'options',
+        //   `value: ${value}, location: ${location}, path: ${path}`
+        // )
+        const isValid = checkAuth0UserId(value)
+        yellow('user_id: isValid', isValid)
+        return isValid
+      }
     }
   }
 }
@@ -44,7 +81,7 @@ const postValidationSchema = {
 /**
  * @param {string} title the title of the todo
  * @param {string} email a valid email address
- * 
+ *
  * @returns {object} [{ _id, title, completed }] an array of one todo
  */
 router.post(
@@ -57,7 +94,7 @@ router.post(
     }
     const td1 = req.body
     // const td2 = filterFields(td1)
-    
+
     const { email, title } = td1
 
     const td2 = {
@@ -93,7 +130,7 @@ const deleteValidationSchema = {
 
 /**
  * @param {string} _id A valid MongoDB object id
- * 
+ *
  * @returns {object} the deleted todo
  */
 
@@ -122,7 +159,7 @@ const getByIdValidationSchema = {
 
 /**
  * @param {string} _id a valid MongoDB object id
- * 
+ *
  * @return {object} 1 todo
  */
 router.get(
@@ -141,7 +178,7 @@ router.get(
 
 /**
  * @param {object} todo a complete todo { _id, title, completed }
- * 
+ *
  * @returns {object} [{ _id, title, completed }] an array of one todo, the modified todo
  */
 
@@ -152,9 +189,7 @@ const patchValidationSchema = {
       errorMessage: 'Parameter id must be a valid MongodDB hex string.'
     }
   },
-  title: {
-    
-  }
+  title: {}
 }
 
 router.patch(

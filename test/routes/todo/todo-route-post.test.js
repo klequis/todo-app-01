@@ -1,5 +1,4 @@
 import { expect } from 'chai'
-import { equals } from 'ramda'
 import {
   goodTodo,
   missingEmailTodo,
@@ -7,7 +6,6 @@ import {
   invalidEmailTodo02,
   missingTitleTodo,
   titleTooShortTodo,
-  codeTitleTodo,
   emptyTitleTodo
 } from './fixture'
 import { dropCollection } from 'db'
@@ -34,7 +32,7 @@ describe('todo-route POST', function() {
       await dropCollection(collectionName)
     })
 
-    it('should post 1 todo', async function() {
+    it.only('should post 1 todo', async function() {
       const r = await sendRequest({
         method: 'POST',
         uri: postUri,

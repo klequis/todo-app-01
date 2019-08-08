@@ -6,7 +6,7 @@ import cors from 'cors'
 import config from '../config'
 import todo from '../routes/todo-route'
 import debug from 'debug'
-import { redf } from '../logger'
+import { redf, red } from '../logger'
 
 // debug
 // debug is not working in 'testLocal'. Maybe take this code out
@@ -48,7 +48,8 @@ app.get('/health', async (req, res) => {
   }
 })
 
-app.use(checkJwt)
+red('WARNING: token check is off!!')
+// app.use(checkJwt)
 
 app.use((req, res, next) => {
   res.header('Content-Type', 'application/json')
