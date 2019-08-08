@@ -142,8 +142,20 @@ router.get(
 /**
  * @param {object} todo a complete todo { _id, title, completed }
  * 
- * @returns {object} [{ _id, title, completed }] an array of one todo
+ * @returns {object} [{ _id, title, completed }] an array of one todo, the modified todo
  */
+
+const patchValidationSchema = {
+  id: {
+    in: ['body'],
+    isMongoId: {
+      errorMessage: 'Parameter id must be a valid MongodDB hex string.'
+    }
+  },
+  title: {
+    
+  }
+}
 
 router.patch(
   '/',
