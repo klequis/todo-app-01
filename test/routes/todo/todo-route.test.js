@@ -15,7 +15,7 @@ describe('todo-route', function() {
     token = await getToken()
   })
   describe('unknown endpoint', function() {
-    it('NEW: should return 400 & unknown endpoint', async () => {
+    it('should return 400 & unknown endpoint', async () => {
       const r = await sendRequest({
         method: 'GET',
         uri: '/api/unknown',
