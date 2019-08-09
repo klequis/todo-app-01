@@ -13,6 +13,8 @@ import { pick } from 'ramda'
 
 import { yellow } from 'logger'
 
+const collectionName = 'todos'
+
 /**
  *
  * @description filter out any undesired fields
@@ -46,6 +48,15 @@ const checkAuth0UserId = userId => {
   return isHexString(id)
 }
 
+const userExists = async userId => {
+  
+  const r = await find(collectionName, {
+    userId: userId
+  })
+  // yellow('userExists: r', r.length)
+  return r.length > 0 ? true : false
+}
+
 const router = express.Router()
 
 const postValidationSchema = {
@@ -56,23 +67,34 @@ const postValidationSchema = {
       options: { min: 3 }
     }
   },
-  // user_id: {
-  //   in: ['body'],
-  //   isEmail: {
-  //     errorMessage: 'Invalid or missing email.'
-  //   }
-  // }
-  user_id: {
+  userId: {
     custom: {
-      options: (value, {req, location, path }) => {
-        // TODO: Show this logging in the book 
+      errorMessage: 'Unknown user',
+      options: async (value, { req, location, path }) => {
+        // TODO: Show this logging in the book
         // yellow(
         //   'options',
         //   `value: ${value}, location: ${location}, path: ${path}`
         // )
-        const isValid = checkAuth0UserId(value)
-        yellow('user_id: isValid', isValid)
-        return isValid
+        yellow('value', value)
+        const chkId = checkAuth0UserId(value)
+        if (!chkId) {
+          yellow('userId is not valid')
+          return false
+        }
+        const exists = await userExists(value)
+        if (!exists) {
+          yellow('user does not exist')
+          return false
+        }
+        yellow('returning true')
+        return true
+        
+        // console.log('final r', r)
+
+        
+        // yellow('user_id: isValid', isValid)
+        // return isValid
       }
     }
   }
@@ -103,7 +125,7 @@ router.post(
       completed: false
     }
 
-    const inserted = await insertOne('todos', td2)
+    const inserted = await insertOne(collectionName, td2)
     res.send(inserted)
   })
 )
@@ -114,7 +136,7 @@ router.post(
 router.get(
   '',
   wrap(async (req, res, next) => {
-    const td1 = await find('todos')
+    const td1 = await find(collectionName)
     res.send(td1)
   })
 )
@@ -143,7 +165,7 @@ router.delete(
       return res.status(422).json({ errors: errors.array() })
     }
     const id = req.params.id
-    const td1 = await findOneAndDelete('todos', id)
+    const td1 = await findOneAndDelete(collectionName, id)
     res.send(td1)
   })
 )
@@ -171,7 +193,7 @@ router.get(
       return res.status(422).json({ errors: errors.array() })
     }
     const id = req.params.id
-    const td1 = await findById('todos', id)
+    const td1 = await findById(collectionName, id)
     res.send(td1)
   })
 )
@@ -199,7 +221,7 @@ router.patch(
     const t2 = filterFields(t1)
     const { _id } = t2
     const t3 = removeIdProp(t2)
-    const r = await findOneAndUpdate('todos', _id, t3)
+    const r = await findOneAndUpdate(collectionName, _id, t3)
     res.send(r)
   })
 )
