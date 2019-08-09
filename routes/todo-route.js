@@ -49,12 +49,13 @@ const checkAuth0UserId = userId => {
 }
 
 const userExists = async userId => {
-  
   const r = await find(collectionName, {
     userId: userId
   })
-  // yellow('userExists: r', r.length)
-  return r.length > 0 ? true : false
+
+  const exists = r.length > 0 ? true : false
+  yellow('userExists: exists', exists)
+  return exists
 }
 
 const router = express.Router()
@@ -71,30 +72,22 @@ const postValidationSchema = {
     custom: {
       errorMessage: 'Unknown user',
       options: async (value, { req, location, path }) => {
+
+        const chkId = checkAuth0UserId(value)
+        if (!chkId) {
+          throw 'userId is not valid.'
+        }
+        const exists = await userExists(value)
+        if (!exists) {
+          throw 'User not found.'
+        }
+
         // TODO: Show this logging in the book
         // yellow(
         //   'options',
         //   `value: ${value}, location: ${location}, path: ${path}`
         // )
-        yellow('value', value)
-        const chkId = checkAuth0UserId(value)
-        if (!chkId) {
-          yellow('userId is not valid')
-          return false
-        }
-        const exists = await userExists(value)
-        if (!exists) {
-          yellow('user does not exist')
-          return false
-        }
-        yellow('returning true')
-        return true
-        
-        // console.log('final r', r)
-
-        
-        // yellow('user_id: isValid', isValid)
-        // return isValid
+        // yellow('value', value)
       }
     }
   }
