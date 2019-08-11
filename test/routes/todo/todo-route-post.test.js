@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import {
   goodTodo,
-  missingEmailTodo,
-  invalidEmailTodo01,
-  invalidEmailTodo02,
+  missingUserIdTodo,
+  invalidUserIdTodo01,
+  invalidUserIdTodo02,
   missingTitleTodo,
   titleTooShortTodo,
   emptyTitleTodo
@@ -11,16 +11,17 @@ import {
 import { dropCollection } from 'db'
 import getToken from 'test/get-token'
 import sendRequest from 'test/sendRequest'
-
-const collectionName = 'todos'
+import { yellow } from 'logger'
+import { TODO_COLLECTION_NAME } from 'routes/constants'
+import { differenceInMilliseconds } from 'date-fns'
 
 const titleTooShortMsg = 'Title must be at least 3 characters long.'
 
-const invalidEmailMsg = 'Invalid or missing email.'
+const unknownUser = 'Unknown user.' // also used for not valid
 
 const postUri = '/api/todo'
 
-describe('todo-route POST', function() {
+describe.only('todo-route POST', function() {
   let token = undefined
 
   before(async function() {
@@ -29,10 +30,9 @@ describe('todo-route POST', function() {
 
   describe('test POST /api/todo', function() {
     before(async function() {
-      await dropCollection(collectionName)
+      await dropCollection(TODO_COLLECTION_NAME)
     })
-
-    it.only('should post 1 todo', async function() {
+    it('should post 1 todo', async function() {
       const r = await sendRequest({
         method: 'POST',
         uri: postUri,
@@ -40,45 +40,52 @@ describe('todo-route POST', function() {
         body: goodTodo,
         token
       })
-      const data = r.body[0]
-      expect(data.title).to.equal(goodTodo.title)
-      expect(data.completed).to.equal(false)
-      expect(data.email).to.equal(goodTodo.email)
+      const { body } = r
+      const todo = body[0]
+      const diff = differenceInMilliseconds(
+        new Date(todo.createdAt),
+        new Date()
+      )
+      expect(Math.abs(diff)).to.be.lessThan(4000)
+      expect(todo.dueDate).to.equal(null)
+      expect(todo.userId).to.equal(goodTodo.userId)
+      expect(todo.title).to.equal(goodTodo.title)
+      expect(todo.completed).to.equal(false)
     })
 
-    it('should fail validation - missing email', async function() {
+    it('should fail validation - missing userId', async function() {
       const r = await sendRequest({
         method: 'POST',
         uri: postUri,
         status: 422,
-        body: missingEmailTodo,
+        body: missingUserIdTodo,
         token
       })
       const { errors } = r.body
-      expect(errors[0].msg).to.equal(invalidEmailMsg)
+      expect(errors[0].msg).to.equal(unknownUser)
     })
 
-    it('should fail validation - invalid email missing tld', async function() {
+    it('should fail validation - mutated guid', async function() {
       const r = await sendRequest({
-        method: 'POST', 
+        method: 'POST',
         uri: postUri,
         status: 422,
-        body: invalidEmailTodo01, 
+        body: invalidUserIdTodo01,
         token
       })
       const { errors } = r.body
-      expect(errors[0].msg).to.equal(invalidEmailMsg)
+      expect(errors[0].msg).to.equal(unknownUser)
     })
     it('should fail validation - invalid email missing @', async function() {
       const r = await sendRequest({
         method: 'POST',
         uri: postUri,
         status: 422,
-        body: invalidEmailTodo02,
+        body: invalidUserIdTodo02,
         token
       })
       const { errors } = r.body
-      expect(errors[0].msg).to.equal(invalidEmailMsg)
+      expect(errors[0].msg).to.equal(unknownUser)
     })
     it('should fail validation - missing title', async function() {
       const r = await sendRequest({

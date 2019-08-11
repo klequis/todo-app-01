@@ -3,16 +3,15 @@ import getToken from './get-token'
 import { dropCollection, insertMany } from 'db'
 import { fourTodos } from './routes/todo/fixture'
 import sendRequest from 'test/sendRequest'
-
-const collectionName = 'todos'
+import { TODO_COLLECTION_NAME } from 'routes/constants'
 
 describe('test getToken()', function() {
   let token
 
   before(async function() {
     token = await getToken()
-    await dropCollection(collectionName)
-    await insertMany(collectionName, fourTodos)
+    await dropCollection(TODO_COLLECTION_NAME)
+    await insertMany(TODO_COLLECTION_NAME, fourTodos)
   })
 
   it('should have keys: access_token, expires_in, token_type ', function() {

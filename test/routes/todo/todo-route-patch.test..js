@@ -1,10 +1,10 @@
 import { expect } from 'chai'
-import { fourTodos, oneTodo } from './fixture'
+import { fourTodos } from './fixture'
 import { dropCollection, insertMany } from 'db'
 import getToken from 'test/get-token'
 import sendRequest from 'test/sendRequest'
+import { TODO_COLLECTION_NAME } from 'routes/constants'
 
-const collectionName = 'todos'
 const patchUri = `/api/todo`
 
 describe('todo-route', function() {
@@ -17,8 +17,8 @@ describe('todo-route', function() {
     let idToUpdate1
     let idToUpdate2
     before(async function() {
-      await dropCollection(collectionName)
-      const inserted = await insertMany(collectionName, fourTodos)
+      await dropCollection(TODO_COLLECTION_NAME)
+      const inserted = await insertMany(TODO_COLLECTION_NAME, fourTodos)
       idToUpdate1 = inserted[1]._id.toString()
       idToUpdate2 = inserted[2]._id.toString()
     })

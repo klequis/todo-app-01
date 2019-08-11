@@ -1,3 +1,7 @@
+import config from 'config'
+
+const cfg = config()
+
 export const fourTodos = [
   {
     title: 'first todo',
@@ -24,15 +28,15 @@ export const goodTodo = {
   userId: 'auth0|5d1c0ac7a482030ea3eaf087',
 }
 // missingEmailTodo
-export const missingEmailTodo = {
-  title: 'a good todo'
+export const missingUserIdTodo = {
+  title: 'missing my userId'
 }
 // invalidEmailTodo
-export const invalidEmailTodo01 = {
-  email: 'testUser@test',
-  title: 'a good todo'
+export const invalidUserIdTodo01 = {
+  title: 'a good todo',
+  userId: 'auth0|5e1f0gh7i482030jk3lmf087', // mutated guid
 }
-export const invalidEmailTodo02 = {
+export const invalidUserIdTodo02 = {
   email: 'testUsertest.com',
   title: 'a good todo'
 }

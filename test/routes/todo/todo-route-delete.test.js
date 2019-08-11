@@ -3,8 +3,7 @@ import { fourTodos, oneTodo } from './fixture'
 import { dropCollection, find, insertMany } from 'db'
 import getToken from 'test/get-token'
 import sendRequest from 'test/sendRequest'
-
-const collectionName = 'todos'
+import { TODO_COLLECTION_NAME } from 'routes/constants'
 
 const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
 const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
@@ -22,9 +21,9 @@ describe('test DELETE /api/todo/:id', function() {
   before(async function() {
     token = await getToken()
 
-    await dropCollection(collectionName)
-    await insertMany(collectionName, fourTodos)
-    const r = await find(collectionName, {})
+    await dropCollection(TODO_COLLECTION_NAME)
+    await insertMany(TODO_COLLECTION_NAME, fourTodos)
+    const r = await find(TODO_COLLECTION_NAME, {})
     expect(r.length).to.equal(4)
     const _id = r[1]._id // returns object
     // The _ids returned by find() are objects. However, in actual use
