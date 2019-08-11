@@ -1,7 +1,6 @@
 import wrap from 'routes/wrap'
-import { yellow } from 'logger'
 import { find } from 'db'
-import { TODO_COLLECTION_NAME } from './constants'
+import { TODO_COLLECTION_NAME } from 'routes/constants'
 
 
 /**
@@ -9,8 +8,6 @@ import { TODO_COLLECTION_NAME } from './constants'
  */
 const todoGet = wrap(async (req, res, next) => {
   const td1 = await find(TODO_COLLECTION_NAME)
-  yellow('GET')
-
   res.send(td1)
 })
 
