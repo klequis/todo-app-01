@@ -76,6 +76,8 @@ const error = (err, req, res, next) => {
     status = 404
   } else if (msg.includes('unknown route')) {
     status = 400
+  } else if (msg.includes('unexpected string in json')) {
+    status = 400
   } else {
     status = 500
   }
