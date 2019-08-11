@@ -3,7 +3,7 @@ import todoGet from './todoGet'
 import todoPost, { postValidationSchema } from './todoPost'
 import todoDelete, { deleteValidationSchema } from './todoDelete'
 import todoGetById, { getByIdValidationSchema } from './todoGetById'
-import { checkSchema, check } from 'express-validator'
+import { checkSchema } from 'express-validator'
 
 
 const router = express.Router()
