@@ -1,5 +1,5 @@
 import wrap from 'routes/wrap'
-import { TODO_COLLECTION_NAME } from './constants'
+import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { findOneAndUpdate } from 'db'
 
 /**
@@ -29,5 +29,11 @@ export const patchValidationSchema = {
       errorMessage: 'Parameter id must be a valid MongodDB hex string.'
     }
   },
-  title: {}
+  title: {
+    in: ['body'],
+    isLength: {
+      errorMessage: 'Title must be at least 3 characters long.',
+      options: { min: 3 }
+    }
+  }
 }
