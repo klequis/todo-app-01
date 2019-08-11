@@ -1,11 +1,30 @@
-import express from 'express'
 import wrap from 'routes/wrap'
-import { validationResult, checkSchema } from 'express-validator'
+import { validationResult } from 'express-validator'
+import { TODO_COLLECTION_NAME } from './constants'
+import { findById } from 'db'
 
 
-const router = express.Router()
 
-const getByIdValidationSchema = {
+
+
+/**
+ * @param {string} _id a valid MongoDB object id
+ *
+ * @return {object} 1 todo
+ */
+const todoGetById = wrap(async (req, res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
+    }
+    const id = req.params.id
+    const td1 = await findById(TODO_COLLECTION_NAME, id)
+    res.send(td1)
+  })
+
+export default todoGetById
+
+export const getByIdValidationSchema = {
   id: {
     in: ['params'],
     isMongoId: {
@@ -13,24 +32,3 @@ const getByIdValidationSchema = {
     }
   }
 }
-
-/**
- * @param {string} _id a valid MongoDB object id
- *
- * @return {object} 1 todo
- */
-const getById = router.get(
-  '/:id',
-  checkSchema(getByIdValidationSchema),
-  wrap(async (req, res) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
-    }
-    const id = req.params.id
-    const td1 = await findById(collectionName, id)
-    res.send(td1)
-  })
-)
-
-export default getById

@@ -1,17 +1,17 @@
-import express from 'express'
 import wrap from 'routes/wrap'
+import { yellow } from 'logger'
+import { find } from 'db'
+import { TODO_COLLECTION_NAME } from './constants'
 
-const router = express.Router()
 
 /**
  * @returns {object} [{ _id, title, completed }] and array of all todos
  */
-export const get = router.get(
-  '',
-  wrap(async (req, res, next) => {
-    const td1 = await find(collectionName)
-    res.send(td1)
-  })
-)
+const todoGet = wrap(async (req, res, next) => {
+  const td1 = await find(TODO_COLLECTION_NAME)
+  yellow('GET')
 
-export default get
+  res.send(td1)
+})
+
+export default todoGet

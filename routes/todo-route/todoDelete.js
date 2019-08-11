@@ -1,17 +1,8 @@
-import express from 'express'
 import wrap from 'routes/wrap'
-import { validationResult, checkSchema } from 'express-validator'
+import { validationResult } from 'express-validator'
+import { findOneAndDelete } from 'db'
+import { TODO_COLLECTION_NAME } from './constants'
 
-const router = express.Router()
-
-const deleteValidationSchema = {
-  id: {
-    in: ['params'],
-    isMongoId: {
-      errorMessage: 'Parameter id must be a valid MongodDB hex string.'
-    }
-  }
-}
 
 /**
  * @param {string} _id A valid MongoDB object id
@@ -20,18 +11,23 @@ const deleteValidationSchema = {
  */
 
  // delete is a key word in JS so use 'del'
-const del = router.delete(
-  '/:id',
-  checkSchema(deleteValidationSchema),
-  wrap(async (req, res) => {
+const todoDelete = wrap(async (req, res) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() })
     }
     const id = req.params.id
-    const td1 = await findOneAndDelete(collectionName, id)
+    const td1 = await findOneAndDelete(TODO_COLLECTION_NAME, id)
     res.send(td1)
   })
-)
 
-export default del
+export const deleteValidationSchema = {
+  id: {
+    in: ['params'],
+    isMongoId: {
+      errorMessage: 'Parameter id must be a valid MongodDB hex string.'
+    }
+  }
+}
+
+export default todoDelete

@@ -1,8 +1,4 @@
-import { yellow } from 'logger'
 import { pick } from 'ramda'
-import { isValid } from 'date-fns'
-
-
 export const filterFields = todo => {
   return pick(
     [
@@ -17,4 +13,3 @@ export const filterFields = todo => {
     todo
   )
 }
-

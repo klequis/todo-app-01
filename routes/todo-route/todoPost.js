@@ -1,8 +1,44 @@
-import express from 'express'
 import wrap from 'routes/wrap'
-import { validationResult, checkSchema } from 'express-validator'
+import { validationResult } from 'express-validator'
+import { filterFields } from './todoHelpers'
+import { insertOne } from 'db'
+import { TODO_COLLECTION_NAME } from './constants'
+import { isValid } from 'date-fns'
+import { find } from 'db'
 
-const router = express.Router()
+import { yellow } from 'logger'
+
+/**
+ * @param {string} title the title of the todo
+ * @param {string} userId
+ *
+ * @returns {object} [{ _id, title, completed }] an array of one todo
+ */
+const todoPost = wrap(async (req, res) => {
+  
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() })
+  }
+  const td1 = filterFields(req.body)
+
+  const { dueDate, title, userId } = td1
+
+  const td2 = {
+    createdAt: new Date(),
+    dueDate: dueDate || null,
+    lastUpdated: new Date(),
+    userId: userId,
+    title: title,
+    completed: false
+  }
+
+  const inserted = await insertOne(TODO_COLLECTION_NAME, td2)
+  res.send(inserted)
+})
+
+export default todoPost
 
 const parseAuth0UserId = userId => {
   const a = userId.split('|')
@@ -24,7 +60,7 @@ export const checkAuth0UserId = userId => {
 }
 
 export const userExists = async userId => {
-  const r = await find(collectionName, {
+  const r = await find(TODO_COLLECTION_NAME, {
     userId: userId
   })
 
@@ -60,7 +96,9 @@ export const postValidationSchema = {
     custom: {
       errorMessage: 'Due date is not a valid date',
       options: value => {
-        yellow('date value', value)
+        if (value === undefined) {
+          return true
+        }
         return isValid(new Date(value))
       }
     }
@@ -88,38 +126,3 @@ export const postValidationSchema = {
     }
   }
 }
-
-
-/**
- * @param {string} title the title of the todo
- * @param {string} email a valid email address
- *
- * @returns {object} [{ _id, title, completed }] an array of one todo
- */
-const post = router.post(
-  '/',
-  checkSchema(postValidationSchema),
-  wrap(async (req, res) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
-    }
-    const td1 = filterFields(req.body)
-
-    const { dueDate, title, userId } = td1
-
-    const td2 = {
-      createdAt: new Date(),
-      dueDate: dueDate || null,
-      lastUpdated: new Date(),
-      userId: userId,
-      title: title,
-      completed: false
-    }
-
-    const inserted = await insertOne(collectionName, td2)
-    res.send(inserted)
-  })
-)
-
-export default post

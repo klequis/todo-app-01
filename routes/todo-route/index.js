@@ -1,34 +1,18 @@
 import express from 'express'
-import {
-  find,
-  findById,
-  insertOne,
-  findOneAndDelete,
-  findOneAndUpdate
-} from 'db'
-import { validationResult, checkSchema } from 'express-validator'
-import { removeIdProp } from 'db/helpers'
-import wrap from '../wrap'
+import todoGet from './todoGet'
+import todoPost, { postValidationSchema } from './todoPost'
+import todoDelete, { deleteValidationSchema } from './todoDelete'
+import todoGetById, { getByIdValidationSchema } from './todoGetById'
+import { checkSchema, check } from 'express-validator'
 
-import {
-  filterFields,
-  postValidationSchema
-} from './todo-route-validation'
 
-import { post } from './todoPost'
-import { patch } from './todoPatch'
-import { get } from './todoGet'
-import { del } from './todoDelete'
-import { getById } from './todoGetById'
-
-const collectionName = 'todos'
 const router = express.Router()
 
-router.post
-router.patch
-router.get
-router.del
-router.getById
-
+router.get('/', todoGet)
+router.post('/', checkSchema(postValidationSchema), todoPost)
+router.delete('/:id', checkSchema(deleteValidationSchema), todoDelete)
+router.get('/:id', checkSchema(getByIdValidationSchema), todoGetById)
 
 export default router
+
+

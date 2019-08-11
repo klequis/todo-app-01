@@ -20,8 +20,8 @@ export const fourTodos = [
 
 // goodTodo
 export const goodTodo = {
-  email: 'testUser@test.com',
-  title: 'a good todo'
+  title: 'a good todo',
+  userId: 'auth0|5d1c0ac7a482030ea3eaf087',
 }
 // missingEmailTodo
 export const missingEmailTodo = {
