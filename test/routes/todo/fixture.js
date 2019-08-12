@@ -1,26 +1,63 @@
 import config from 'config'
+import { yellow } from 'logger'
 
 const cfg = config()
 
 const auth0Id = cfg.testUser.auth0Id
 
+yellow('fixture: auth0Id', auth0Id)
 
 export const fourTodos = [
   {
-    title: 'first todo',
-    completed: false
+    completed: false,
+    userId: auth0Id,
+    title: 'first todo'
   },
   {
     title: 'second todo',
-    completed: false
+    completed: false,
+    userId: auth0Id
   },
   {
     title: 'third todo',
-    completed: false
+    completed: false,
+    userId: auth0Id
   },
   {
     title: 'fourth todo',
-    completed: false
+    completed: false,
+    userId: auth0Id
+  }
+]
+
+export const fourTodosForPost = [
+  {
+    completed: false,
+    createdAt: '2019-08-12T17:01:16.927Z',
+    lastUpdatedAt: '2019-08-12T17:01:16.927Z',
+    userId: auth0Id,
+    title: 'first todo'
+  },
+  {
+    completed: false,
+    createdAt: '2019-08-12T17:01:16.927Z',
+    lastUpdatedAt: '2019-08-12T17:01:16.927Z',
+    title: 'second todo',
+    userId: auth0Id
+  },
+  {
+    completed: false,
+    createdAt: '2019-08-12T17:01:16.927Z',
+    lastUpdatedAt: '2019-08-12T17:01:16.927Z',
+    title: 'third todo',
+    userId: auth0Id
+  },
+  {
+    completed: false,
+    createdAt: '2019-08-12T17:01:16.927Z',
+    lastUpdatedAt: '2019-08-12T17:01:16.927Z',
+    title: 'fourth todo',
+    userId: auth0Id
   }
 ]
 
@@ -29,7 +66,7 @@ export const todoMinimumFieldsForPost = {
   title: 'a good todo',
   userId: auth0Id
 }
-// missing userId 
+// missing userId
 export const todoMissingUserId = {
   title: 'missing my userId'
 }
