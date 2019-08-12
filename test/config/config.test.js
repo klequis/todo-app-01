@@ -17,6 +17,8 @@ describe('test config', function() {
     })
 
     describe(`test config for ${env}`, function() {
+
+      // apiRoot
       it('should return apiRoot', function() {
         if (env in [TEST_LOCAL, DEV, TEST_LOCAL]) {
           expect(cfg.apiRoot).to.equal(settings.apiRoot.local)
@@ -25,15 +27,21 @@ describe('test config', function() {
           expect(cfg.apiRoot).to.equal(settings.apiRoot.remote)
         }
       })
-      it('should return 7', function() {
+
+      // number of keys
+      it('should return 7 keys', function() {
         // decided to only do this test to auth0 data to keep
         // data concealed.
         // Isn't env dependent but should be the same in each environment
         expect(Object.keys(cfg.auth0).length).to.equal(7)
       })
-      it('should = production', function() {
+
+      // test 'env' itself
+      it('should return currently set env', function() {
         expect(cfg.env).to.equal(env)
       })
+
+      // port
       it('should return server port', function() {
         if (env in [TEST_LOCAL, DEV, TEST_LOCAL]) {
           expect(cfg.port).to.equal(settings.serverPort.local)
@@ -45,6 +53,7 @@ describe('test config', function() {
     })
   })
 
+  // test unknown environment
   describe('config should throw', function() {
     it('should throw', function() {
       expect(() => config('junk')).to.throw()
