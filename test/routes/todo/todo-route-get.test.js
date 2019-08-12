@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { fourTodos, oneTodo } from './fixture'
+import { fourTodos } from './fixture'
 import {
   dropCollection,
   insertMany,
