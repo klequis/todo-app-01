@@ -102,7 +102,8 @@ const config = env => {
     auth0: settings.auth0,
     env: _env,
     dbName: dbName(_env),
-    mongoUri: mongoUri(_env)
+    mongoUri: mongoUri(_env),
+    testUser: settings.testUser
   }
 }
 
