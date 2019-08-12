@@ -1,19 +1,20 @@
 import { expect } from 'chai'
 import {
-  goodTodo,
-  missingUserIdTodo,
-  invalidUserIdTodo01,
-  invalidUserIdTodo02,
-  missingTitleTodo,
-  titleTooShortTodo,
-  emptyTitleTodo
+  todoMinimumFieldsForPost,
+  todoMissingUserId,
+  todoInvalidUserId,
+  todoJunkUserId,
+  todoMissingTitle,
+  todoTitleTooShort,
+  todoEmptyTitle
 } from './fixture'
 import { dropCollection } from 'db'
 import getToken from 'test/get-token'
 import sendRequest from 'test/sendRequest'
-import { yellow } from 'logger'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { differenceInMilliseconds } from 'date-fns'
+
+import { yellow } from 'logger'
 
 const titleTooShortMsg = 'Title must be at least 3 characters long.'
 
@@ -21,7 +22,7 @@ const unknownUser = 'Unknown user.' // also used for not valid
 
 const postUri = '/api/todo'
 
-describe.only('todo-route POST', function() {
+describe('todo-route POST', function() {
   let token = undefined
 
   before(async function() {
@@ -37,7 +38,7 @@ describe.only('todo-route POST', function() {
         method: 'POST',
         uri: postUri,
         status: 200,
-        body: goodTodo,
+        body: todoMinimumFieldsForPost,
         token
       })
       const { body } = r
@@ -48,8 +49,8 @@ describe.only('todo-route POST', function() {
       )
       expect(Math.abs(diff)).to.be.lessThan(4000)
       expect(todo.dueDate).to.equal(null)
-      expect(todo.userId).to.equal(goodTodo.userId)
-      expect(todo.title).to.equal(goodTodo.title)
+      expect(todo.userId).to.equal(todoMinimumFieldsForPost.userId)
+      expect(todo.title).to.equal(todoMinimumFieldsForPost.title)
       expect(todo.completed).to.equal(false)
     })
 
@@ -58,7 +59,7 @@ describe.only('todo-route POST', function() {
         method: 'POST',
         uri: postUri,
         status: 422,
-        body: missingUserIdTodo,
+        body: todoMissingUserId,
         token
       })
       const { errors } = r.body
@@ -70,7 +71,7 @@ describe.only('todo-route POST', function() {
         method: 'POST',
         uri: postUri,
         status: 422,
-        body: invalidUserIdTodo01,
+        body: todoInvalidUserId,
         token
       })
       const { errors } = r.body
@@ -81,7 +82,7 @@ describe.only('todo-route POST', function() {
         method: 'POST',
         uri: postUri,
         status: 422,
-        body: invalidUserIdTodo02,
+        body: todoJunkUserId,
         token
       })
       const { errors } = r.body
@@ -92,7 +93,7 @@ describe.only('todo-route POST', function() {
         method: 'POST', 
         uri: postUri,
         status: 422,
-        body: missingTitleTodo,
+        body: todoMissingTitle,
         token
       })
       const { errors } = r.body
@@ -103,7 +104,7 @@ describe.only('todo-route POST', function() {
         method: 'POST', 
         uri: postUri,
         status: 422,
-        body: titleTooShortTodo,
+        body: todoTitleTooShort,
         token
       })
       const { errors } = r.body
@@ -114,7 +115,7 @@ describe.only('todo-route POST', function() {
         method: 'POST', 
         uri: postUri,
         status: 422,
-        body: emptyTitleTodo,
+        body: todoEmptyTitle,
         token})
       const { errors } = r.body
       expect(errors[0].msg).to.equal(titleTooShortMsg)
