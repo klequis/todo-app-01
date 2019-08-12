@@ -63,8 +63,10 @@ app.get('*', function(req, res) {
 
 const error = (err, req, res, next) => {
   if (process.env.NODE_ENV !== 'production') {
-    redf('server.error', err) // works in test
+    console.log()
+    redf('server.error', err.message) // works in test
     lServerError(err.message) // works only in dev
+    console.log()
   }
 
   let status
