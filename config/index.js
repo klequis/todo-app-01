@@ -38,13 +38,13 @@ const mongoUri = env => {
 const dbName = env => {
   switch (env) {
     case TEST_LOCAL:
-      return settings.dbName.test
+      return settings.db[TEST_LOCAL].dbName
     case TEST_REMOTE:
-      return settings.dbName.test
+      return settings.db[TEST_REMOTE].dbName
     case DEV:
-      return settings.dbName.development
+      return settings.db[DEV].dbName
     case PROD:
-      return settings.dbName.production
+      return settings.db[PROD].dbName
     default:
       throw new Error(unknowEnvName())
   }
