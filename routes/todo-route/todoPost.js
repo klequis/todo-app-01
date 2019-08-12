@@ -17,7 +17,7 @@ const todoPost = wrap(async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
-    green('todoPost errors', errors.array())
+    // green('todoPost errors', errors.array())
     return res.status(422).json({ errors: errors.array() })
   }
   const td1 = filterFields(req.body)
@@ -38,16 +38,6 @@ const todoPost = wrap(async (req, res) => {
 })
 
 export default todoPost
-
-// export const userExists = async userId => {
-//   // green('userExists: userId', userId)
-//   const r = await find(TODO_COLLECTION_NAME, {
-//     userId: userId
-//   })
-
-//   const exists = r.length > 0 ? true : false
-//   return exists
-// }
 
 export const postValidationSchema = {
   title: {
