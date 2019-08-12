@@ -2,6 +2,9 @@ import config from 'config'
 
 const cfg = config()
 
+const auth0Id = cfg.testUser.auth0Id
+
+
 export const fourTodos = [
   {
     title: 'first todo',
@@ -21,36 +24,37 @@ export const fourTodos = [
   }
 ]
 
-
-// goodTodo
-export const goodTodo = {
+// minium fields for post
+export const todoMinimumFieldsForPost = {
   title: 'a good todo',
-  userId: 'auth0|5d1c0ac7a482030ea3eaf087',
+  userId: auth0Id
 }
-// missingEmailTodo
-export const missingUserIdTodo = {
+// missing userId 
+export const todoMissingUserId = {
   title: 'missing my userId'
 }
-// invalidEmailTodo
-export const invalidUserIdTodo01 = {
+// invalid userId
+export const todoInvalidUserId = {
   title: 'a good todo',
-  userId: 'auth0|5e1f0gh7i482030jk3lmf087', // mutated guid
+  userId: 'auth0|5e1f0gh7i482030jk3lmf087' // mutated guid
 }
-export const invalidUserIdTodo02 = {
-  email: 'testUsertest.com',
+
+// junk userId with '|'
+export const todoJunkUserId = {
+  userId: 'some|oddStuff',
   title: 'a good todo'
 }
-// missingTitleTodo
-export const missingTitleTodo = {
-  email: 'testUser@test.com'
+
+export const todoMissingTitle = {
+  userId: auth0Id
 }
-// titleTooShort
-export const titleTooShortTodo = {
-  email: 'testUser@test.com',
+// title too short
+export const todoTitleTooShort = {
+  userId: auth0Id,
   title: 'ab'
 }
-// emptyTitle
-export const emptyTitleTodo = {
-  email: 'testUser@test.com',
+// empty title
+export const todoEmptyTitle = {
+  userId: auth0Id,
   title: ''
 }
