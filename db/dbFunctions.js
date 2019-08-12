@@ -1,5 +1,5 @@
 import mongodb, { ObjectID } from 'mongodb'
-import { removeIdProp } from './helpers'
+import { removeIdProp } from 'lib'
 import config from '../config'
 
 const MongoClient = mongodb.MongoClient
