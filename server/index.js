@@ -61,27 +61,41 @@ app.get('*', function(req, res) {
   throw new Error(`unknown route: ..${req.url}`)
 })
 
-const error = (err, req, res, next) => {
+const logError = (err, verbose=false) => {
   if (process.env.NODE_ENV !== 'production') {
     console.log()
-    redf('server.error', err.message) // works in test
-    lServerError(err.message) // works only in dev
+    if (verbose) {
+      redf('server.error', err) // works in test
+      lServerError(err) // works only in dev
+    } else {
+      redf('server.error', err.message) // works in test
+      lServerError(err.message) // works only in dev
+    }
     console.log()
   }
+}
+
+const error = (err, req, res, next) => {
+  let expectedErr = false
 
   let status
   const msg = err.message.toLowerCase()
 
   if (msg === 'no authorization token was found') {
     status = 401
+    logError(err)
   } else if (msg.includes('no document found')) {
     status = 404
+    logError(err)
   } else if (msg.includes('unknown route')) {
     status = 400
+    logError(err)
   } else if (msg.includes('unexpected string in json')) {
     status = 400
+    logError(err)
   } else {
     status = 500
+    logError(err, true)
   }
 
   res.status(status)
