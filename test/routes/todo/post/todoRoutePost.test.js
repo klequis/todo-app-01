@@ -11,7 +11,7 @@ import {
   todoEmptyTitle
 } from './fixture'
 import { dropCollection } from 'db'
-import getToken from 'test/get-token'
+import getToken from 'test/getToken'
 import sendRequest from 'test/sendRequest'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { differenceInMilliseconds } from 'date-fns'
@@ -41,7 +41,7 @@ function diffDateTime(date1, date2) {
   
 }
 
-describe('todo-route POST', function() {
+describe('todoRoute POST', function() {
   let token = undefined
 
   before(async function() {

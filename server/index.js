@@ -4,7 +4,7 @@ import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import config from '../config'
-import todo from '../routes/todo-route'
+import todo from 'routes/todoRoute'
 import debug from 'debug'
 import { redf, red } from '../logger'
 

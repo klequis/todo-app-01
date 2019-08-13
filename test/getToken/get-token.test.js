@@ -1,7 +1,7 @@
 import { expect } from 'chai'
-import getToken from './get-token'
+import getToken from 'test/getToken'
 import { dropCollection, insertMany } from 'db'
-import { fourTodos } from './routes/todo/fixture'
+import { fourTodos } from './fixture'
 import sendRequest from 'test/sendRequest'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 

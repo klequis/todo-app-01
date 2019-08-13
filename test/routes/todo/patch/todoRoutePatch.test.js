@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { fourTodos, patchErrors } from './patchFixture'
 import { dropCollection, insertMany } from 'db'
-import getToken from 'test/get-token'
+import getToken from 'test/getToken'
 import sendRequest from 'test/sendRequest'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { mergeRight } from 'ramda'
@@ -15,7 +15,7 @@ import {
   mongoIdCheck,
   titleLengthCheck,
   userIdCheck,
-} from 'routes/todo-route/validationChecks'
+} from 'routes/todoRoute/validationChecks'
 
 function patchUri(id) {
   return `/api/todo/${id}`
@@ -23,7 +23,7 @@ function patchUri(id) {
 
 function getErrorByParam(param) {}
 
-describe('todo-route PATCH', function() {
+describe('todoRoute PATCH', function() {
   let token = undefined
   before(async function() {
     token = await getToken()
