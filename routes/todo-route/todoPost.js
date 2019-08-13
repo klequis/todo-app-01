@@ -4,8 +4,6 @@ import { filterFields } from './todoHelpers'
 import { insertOne } from 'db'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { isValidDate, isValidAuth0UserId } from 'lib'
-import { find } from 'db'
-import { green } from 'logger'
 
 /**
  * @param {string} title the title of the todo
@@ -24,10 +22,12 @@ const todoPost = wrap(async (req, res) => {
 
   const { dueDate, title, userId } = td1
 
+  // are fields complete?
+  // can all these fields be set?
   const td2 = {
     createdAt: new Date(),
     dueDate: dueDate || null,
-    lastUpdated: new Date(),
+    lastUpdatedAt: new Date(),
     userId: userId,
     title: title,
     completed: false
@@ -50,7 +50,7 @@ export const postValidationSchema = {
   dueDate: {
     in: ['body'],
     custom: {
-      errorMessage: 'Due date is not a valid date',
+      errorMessage: 'Due date is not a valid date.',
       options: value => isValidDate(value, true)
     }
   },
