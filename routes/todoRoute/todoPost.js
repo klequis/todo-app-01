@@ -1,9 +1,10 @@
 import wrap from 'routes/wrap'
 import { validationResult } from 'express-validator'
-import { filterFields } from './todoHelpers'
 import { insertOne } from 'db'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { isValidDate, isValidAuth0UserId } from 'lib'
+
+import { green } from 'logger'
 
 /**
  * @param {string} title the title of the todo
@@ -15,25 +16,23 @@ const todoPost = wrap(async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
-    // green('todoPost errors', errors.array())
     return res.status(422).json({ errors: errors.array() })
   }
-  const td1 = filterFields(req.body)
 
-  const { dueDate, title, userId } = td1
+  const { body } = req
 
-  // are fields complete?
-  // can all these fields be set?
-  const td2 = {
+  const { dueDate, title, userId } = body
+
+  const td1 = {
+    completed: false,
     createdAt: new Date(),
     dueDate: dueDate || null,
     lastUpdatedAt: new Date(),
-    userId: userId,
     title: title,
-    completed: false
+    userId: userId,
   }
 
-  const inserted = await insertOne(TODO_COLLECTION_NAME, td2)
+  const inserted = await insertOne(TODO_COLLECTION_NAME, td1)
   res.send(inserted)
 })
 
