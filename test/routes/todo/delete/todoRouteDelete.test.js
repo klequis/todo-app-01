@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { fourTodos, oneTodo } from './fixture'
+import { fourTodos } from './fixture'
 import { dropCollection, find, insertMany } from 'db'
 import getToken from 'test/getToken'
 import sendRequest from 'test/sendRequest'
