@@ -34,7 +34,7 @@ const todoPatch = wrap(async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
-    // green('todoPatch errors', errors.array())
+    green('todoPatch errors', errors.array())
     return res.status(422).json({ errors: errors.array() })
   }
 
