@@ -2,7 +2,6 @@ import wrap from 'routes/wrap'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { findOneAndUpdate } from 'db'
 import { validationResult } from 'express-validator'
-import { removeIdProp } from 'lib'
 import { mergeRight, pick } from 'ramda'
 import {
   mongoIdCheck,
@@ -42,7 +41,6 @@ const todoPatch = wrap(async (req, res) => {
   const { body, params } = req
   
   const _id = params.id
-  green('_id', _id)
 
   // filter incoming fields
   const t1 = pick([
@@ -51,8 +49,6 @@ const todoPatch = wrap(async (req, res) => {
     'lastUpdatedAt',
     'title',
   ], body)
-
-  // const { _id } = t1
   const t2 = mergeRight(t1, { lastUpdatedAt: new Date().toISOString() })
 
   const r = await findOneAndUpdate(TODO_COLLECTION_NAME, _id, t2)
