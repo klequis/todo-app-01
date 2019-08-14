@@ -2,7 +2,6 @@ import wrap from 'routes/wrap'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { findOneAndUpdate } from 'db'
 import { validationResult } from 'express-validator'
-import { filterFields } from './todoHelpers'
 import { removeIdProp } from 'lib'
 import { mergeRight, pick } from 'ramda'
 import {
@@ -36,32 +35,28 @@ const todoPatch = wrap(async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
-    green('todoPatch errors', errors.array())
+    // green('todoPatch errors', errors.array())
     return res.status(422).json({ errors: errors.array() })
   }
 
-  const { body } = req
-  green('body', body)
+  const { body, params } = req
+  
+  const _id = params.id
+  green('_id', _id)
 
-  // only these fields can be changed
+  // filter incoming fields
   const t1 = pick([
-    '_id',
     'completed',
     'dueDate',
     'lastUpdatedAt',
     'title',
   ], body)
-  
-  green('t1', t1)
 
+  // const { _id } = t1
+  const t2 = mergeRight(t1, { lastUpdatedAt: new Date().toISOString() })
 
-  const { _id } = t1
-  green('_id', _id)
-  const t2 = removeIdProp(t1)
-  green('t2', t2)
-  const t3 = mergeRight(t2, { lastUpdatedAt: new Date().toISOString() })
-  green('PATCH t3 - final', t3)
-  const r = await findOneAndUpdate(TODO_COLLECTION_NAME, _id, t3)
+  const r = await findOneAndUpdate(TODO_COLLECTION_NAME, _id, t2)
+  green('r', r)
   res.send(r)
 })
 
