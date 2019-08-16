@@ -21,7 +21,6 @@ export const yellow = (message, value) => {
   log(chalk.bgYellow(chalk.black(` ${message} `)), checkValue(value))
 }
 export const blue = (message, value) => {
-  console.log('blue **********************8')
   log(chalk.bgBlue(` ${message} `), checkValue(value))
 }
 
@@ -57,5 +56,25 @@ export const logResponse = res => {
   } else {
     log(chalk.bgRed('response'), r)
   }
-  
+}
+
+export const logRequest = req => {
+  // console.Group('** logRequest **')
+  const r = {
+    text: req.text,
+    body: req.body,
+    params: req.params
+    // headers: req.headers,
+    // clientError: res.clientError,
+    // serverError: res.serverError,
+    // error: res.error,
+    // type: req.type,
+    // charset: res.charset
+  }
+  log(chalk.bgGreen('response'), r)
+  // if (res.ok) {
+  //   log(chalk.bgGreen('response'), r)
+  // } else {
+  //   log(chalk.bgRed('response'), r)
+  // }
 }
