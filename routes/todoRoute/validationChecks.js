@@ -100,9 +100,9 @@ export const userIdInBodyCheck = {
   custom: {
     options: async (value, { req, location, path }) => {
       const errMsg = 'Unknown user.'
-      blue('userIdInBodyCheck: value', value)
-      blue('userIdInBodyCheck: location', location)
-      blue('userIdInBodyCheck: path', path)
+      // blue('userIdInBodyCheck: value', value)
+      // blue('userIdInBodyCheck: location', location)
+      // blue('userIdInBodyCheck: path', path)
 
       // if value = undefined isUUID will error its
       // own error message which will be returned and
