@@ -2,13 +2,10 @@ import { expect } from 'chai'
 import {
   aNewTodoWithDueDate,
   aNewTodoWithoutDueDate,
-  todoMinimumFieldsForPost,
-  todoMissingUserId,
-  todoInvalidUserId,
-  todoJunkUserId,
-  todoMissingTitle,
-  todoTitleTooShort,
-  todoEmptyTitle
+  auth0UUID,
+  todoInvalidUserIdInBody,
+  todoMissingUserIdInBody,
+  todoTitleTooShort
 } from './fixture'
 import { dropCollection } from 'db'
 import getToken from 'test/getToken'
@@ -22,7 +19,7 @@ const titleTooShortMsg = 'Title must be at least 3 characters long.'
 
 const unknownUser = 'Unknown user.' // also used for not valid
 
-const postUri = '/api/todo'
+const postUri = `/api/todo/${auth0UUID}`
 
 function diffDateTime(date1, date2) {
   let d1
@@ -38,7 +35,6 @@ function diffDateTime(date1, date2) {
     d2 = date2
   }
   return differenceInMilliseconds(new Date(d1), new Date(d2))
-  
 }
 
 describe('todoRoute POST', function() {
@@ -47,8 +43,7 @@ describe('todoRoute POST', function() {
   before(async function() {
     token = await getToken()
   })
-
-  describe('test POST /api/todo', function() {
+  describe('valid tests - should return 1 todo', function() {
     before(async function() {
       await dropCollection(TODO_COLLECTION_NAME)
     })
@@ -60,27 +55,20 @@ describe('todoRoute POST', function() {
         uri: postUri,
         status: 200,
         body: todoSent,
-        token,
+        token
       })
       const { body } = r
+      // yellow('body', body)
       expect(body.length).to.equal(1)
       const todo = body[0]
-      // _id - new todo does not have an _id
-      // completed
       expect(todo.completed).to.equal(false)
-      // createdAt - allow 400 miliseconds diffence
       const diffCreatedAt = diffDateTime(todo.createdAt, new Date())
       expect(Math.abs(diffCreatedAt)).to.be.lessThan(400)
-      // dueDate
       expect(todo.dueDate).to.equal(todoSent.dueDate)
-      // lastUpdateAt
       const diffLastUpdated = diffDateTime(todo.lastUpdatedAt, new Date())
       expect(Math.abs(diffLastUpdated)).to.be.lessThan(400)
-      // title
       expect(todo.title).to.equal(todoSent.title)
-      // userId
-      expect(todo.userId).to.equal(todoSent.userId)
-
+      expect(todo.userId).to.equal(auth0UUID)
     })
     it('new todo without dueDate', async function() {
       const todoSent = aNewTodoWithoutDueDate
@@ -92,90 +80,67 @@ describe('todoRoute POST', function() {
         token
       })
       const { body } = r
+      // yellow('body', body)
       expect(body.length).to.equal(1)
       const todo = body[0]
-      // _id - new todo does not have an _id
-      // completed
       expect(todo.completed).to.equal(false)
-      // createdAt - allow 400 miliseconds diffence
       const diffCreatedAt = diffDateTime(todo.createdAt, new Date())
       expect(Math.abs(diffCreatedAt)).to.be.lessThan(400)
-      // dueDate
       expect(todo.dueDate).to.equal(null)
-      // lastUpdateAt
       const diffLastUpdated = diffDateTime(todo.lastUpdatedAt, new Date())
       expect(Math.abs(diffLastUpdated)).to.be.lessThan(400)
-      // title
       expect(todo.title).to.equal(todoSent.title)
-      // userId
-      expect(todo.userId).to.equal(todoSent.userId)
+      expect(todo.userId).to.equal(auth0UUID)
     })
 
-    it('should fail validation - missing userId', async function() {
-      const r = await sendRequest({
-        method: 'POST',
-        uri: postUri,
-        status: 422,
-        body: todoMissingUserId,
-        token
+    describe('invalid tests - should return validation errors[]', function() {
+      before(async function() {
+        await dropCollection(TODO_COLLECTION_NAME)
       })
-      const { errors } = r.body
-      expect(errors[0].msg).to.equal(unknownUser)
-    })
-
-    it('should fail validation - mutated guid', async function() {
-      const r = await sendRequest({
-        method: 'POST',
-        uri: postUri,
-        status: 422,
-        body: todoInvalidUserId,
-        token
+      it('missing userId in body', async function() {
+        const todoSent = todoMissingUserIdInBody
+        const r = await sendRequest({
+          method: 'POST',
+          uri: postUri,
+          status: 422,
+          body: todoSent,
+          token
+        })
+        const { body } = r
+        const { errors } = body
+        expect(errors.length).to.equal(1)
+        expect(errors[0].msg).to.equal('Unknown user')
       })
-      const { errors } = r.body
-      expect(errors[0].msg).to.equal(unknownUser)
-    })
-    it('should fail validation - invalid email missing @', async function() {
-      const r = await sendRequest({
-        method: 'POST',
-        uri: postUri,
-        status: 422,
-        body: todoJunkUserId,
-        token
+      it('invalid userId in body', async function() {
+        const todoSent = todoInvalidUserIdInBody
+        const r = await sendRequest({
+          method: 'POST',
+          uri: postUri,
+          status: 422,
+          body: todoSent,
+          token
+        })
+        const { body } = r
+        const { errors } = body
+        expect(errors.length).to.equal(1)
+        expect(errors[0].msg).to.equal('Unknown user')
       })
-      const { errors } = r.body
-      expect(errors[0].msg).to.equal(unknownUser)
-    })
-    it('should fail validation - missing title', async function() {
-      const r = await sendRequest({
-        method: 'POST', 
-        uri: postUri,
-        status: 422,
-        body: todoMissingTitle,
-        token
+      it('title too short', async function() {
+        const todoSent = todoTitleTooShort
+        const r = await sendRequest({
+          method: 'POST',
+          uri: postUri,
+          status: 422,
+          body: todoSent,
+          token
+        })
+        const { body } = r
+        const { errors } = body
+        expect(errors.length).to.equal(1)
+        expect(errors[0].msg).to.equal(
+          'Title must be at least 3 characters long.'
+        )
       })
-      const { errors } = r.body
-      expect(errors[0].msg).to.equal(titleTooShortMsg)
-    })
-    it('should fail validation - title too short', async function() {
-      const r = await sendRequest({
-        method: 'POST', 
-        uri: postUri,
-        status: 422,
-        body: todoTitleTooShort,
-        token
-      })
-      const { errors } = r.body
-      expect(errors[0].msg).to.equal(titleTooShortMsg)
-    })
-    it('should fail validation - empty title', async function() {
-      const r = await sendRequest({
-        method: 'POST', 
-        uri: postUri,
-        status: 422,
-        body: todoEmptyTitle,
-        token})
-      const { errors } = r.body
-      expect(errors[0].msg).to.equal(titleTooShortMsg)
     })
   })
 })

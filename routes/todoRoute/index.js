@@ -9,12 +9,13 @@ import { checkSchema } from 'express-validator'
 
 const router = express.Router()
 
-router.delete('/:id', checkSchema(deleteValidationSchema), todoDelete)
-router.get('/', todoGet)
-router.get('/:id', checkSchema(getByIdValidationSchema), todoGetById)
-router.patch('/:id', checkSchema(patchValidationSchema), todoPatch)
-// router.patch('/:id', todoPatch)
-router.post('/', checkSchema(postValidationSchema), todoPost)
+router.delete('/:userid/:todoid', checkSchema(deleteValidationSchema), todoDelete)
+router.get('/:userid', todoGet)
+router.get('/:userid/:todoid', checkSchema(getByIdValidationSchema), todoGetById)
+router.patch('/:userid/:todoid', checkSchema(patchValidationSchema), todoPatch)
+// router.patch('/:id/todoid', todoPatch)
+router.post('/:userid', checkSchema(postValidationSchema), todoPost)
+// router.post('/:userid', todoPost)
 
 
 export default router

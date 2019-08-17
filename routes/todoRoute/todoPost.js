@@ -2,9 +2,14 @@ import wrap from 'routes/wrap'
 import { validationResult } from 'express-validator'
 import { insertOne } from 'db'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
-import { isValidDate, isValidAuth0UserId } from 'lib'
+import {
+  dueDateCheck,
+  titleLengthCheck,
+  userIdInBodyCheck,
+  userIdInParamsCheck
+} from './validationChecks'
 
-import { green } from 'logger'
+import { green, logRequest } from 'logger'
 
 /**
  * @param {string} title the title of the todo
@@ -13,15 +18,22 @@ import { green } from 'logger'
  * @returns {object} [{ _id, title, completed }] an array of one todo
  */
 const todoPost = wrap(async (req, res) => {
+  green('**POST')
+  logRequest(req)
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
+    green('post Errors', errors)
     return res.status(422).json({ errors: errors.array() })
   }
 
-  const { body } = req
+  const { body, params } = req
 
-  const { dueDate, title, userId } = body
+  const { dueDate, title } = body
+
+  // green('POST params', params)
+  const { userid } = params
+  // green('POST userid', userid)
 
   const td1 = {
     completed: false,
@@ -29,34 +41,19 @@ const todoPost = wrap(async (req, res) => {
     dueDate: dueDate || null,
     lastUpdatedAt: new Date(),
     title: title,
-    userId: userId,
+    userId: userid
   }
 
   const inserted = await insertOne(TODO_COLLECTION_NAME, td1)
+  // green('POST inserted', inserted)
   res.send(inserted)
 })
 
 export default todoPost
 
 export const postValidationSchema = {
-  title: {
-    in: ['body'],
-    isLength: {
-      errorMessage: 'Title must be at least 3 characters long.',
-      options: { min: 3 }
-    }
-  },
-  dueDate: {
-    in: ['body'],
-    custom: {
-      errorMessage: 'Due date is not a valid date.',
-      options: value => isValidDate(value, true)
-    }
-  },
-  userId: {
-    custom: {
-      errorMessage: 'Unknown user.',
-      options: value => isValidAuth0UserId(value)
-    }
-  }
+  title: titleLengthCheck,
+  dueDate: dueDateCheck,
+  userId: userIdInBodyCheck,
+  userid: userIdInParamsCheck
 }

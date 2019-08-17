@@ -4,9 +4,11 @@ import { findOneAndDelete } from 'db'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 
 
+
 /**
+ * @param {string} userid 
  * @param {string} _id A valid MongoDB object id
- *
+  *
  * @returns {object} the deleted todo
  */
 
@@ -31,3 +33,4 @@ export const deleteValidationSchema = {
 }
 
 export default todoDelete
+

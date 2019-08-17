@@ -4,16 +4,18 @@ import { findOneAndUpdate } from 'db'
 import { validationResult } from 'express-validator'
 import { mergeRight, pick } from 'ramda'
 import {
-  mongoIdCheck,
+  mongoIdInBodyCheck,
+  mongoIdInParamsCheck,
   completedCheck,
   createdAtCheck,
   dueDateCheck,
   titleLengthCheck,
-  userIdCheck,
+  userIdInBodyCheck,
+  userIdInParamsCheck,
   lastUpdatedAtCheck
 } from './validationChecks'
 
-import { green } from 'logger'
+import { green, red } from 'logger'
 
 // green('t1', t1)
 // green('_id isMongo', isMongoId(t1._id))
@@ -30,7 +32,7 @@ import { green } from 'logger'
  */
 
 const todoPatch = wrap(async (req, res) => {
-  
+  red('_id in todo MUST = userid in params')
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -40,7 +42,10 @@ const todoPatch = wrap(async (req, res) => {
 
   const { body, params } = req
   
-  const _id = params.id
+  // const _id = params.id
+  const { userid } = params
+  const { _id } = body
+
 
   // filter incoming fields
   const t1 = pick([
@@ -51,7 +56,7 @@ const todoPatch = wrap(async (req, res) => {
   ], body)
   const t2 = mergeRight(t1, { lastUpdatedAt: new Date().toISOString() })
 
-  const r = await findOneAndUpdate(TODO_COLLECTION_NAME, _id, t2)
+  const r = await findOneAndUpdate(TODO_COLLECTION_NAME, { _id, userId: userid }, t2)
   green('r', r)
   res.send(r)
 })
@@ -59,11 +64,14 @@ const todoPatch = wrap(async (req, res) => {
 export default todoPatch
 
 export const patchValidationSchema = {
-  id: mongoIdCheck,
+  todoid: mongoIdInParamsCheck,
+  _id: mongoIdInBodyCheck,
+
   completed: completedCheck,
   createdAt: createdAtCheck,
   dueDate: dueDateCheck,
   lastUpdatedAt: lastUpdatedAtCheck,
   title: titleLengthCheck,
-  userId: userIdCheck
+  userId: userIdInBodyCheck,
+  userid: userIdInParamsCheck
 }

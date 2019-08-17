@@ -12,6 +12,8 @@ import {
   insertOne
 } from 'db'
 
+import { yellow } from 'logger'
+
 
 chai.use(chaiAsPromised)
 
@@ -110,9 +112,11 @@ describe('dbFunctions success cases', function() {
       await dropCollection(collectionName)
       const ret = await insertMany(collectionName, fourTodos)
       idToUpdate = ret[1]._id.toString()
+      yellow('idToUpdate', idToUpdate)
     })
     it('findOneAndUpdate: should return updated document', async function() {
-      const ret = await findOneAndUpdate(collectionName, idToUpdate, newData)
+      const ret = await findOneAndUpdate(collectionName, { _id: idToUpdate }, newData)
+      yellow('ret', ret)
       expect(ret[0]._id.toString()).to.equal(idToUpdate)
       expect(ret[0].title).to.equal(newData.title)
       expect(ret[0].completed).to.equal(newData.completed)

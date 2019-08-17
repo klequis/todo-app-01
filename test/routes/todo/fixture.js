@@ -5,7 +5,6 @@ const cfg = config()
 
 const auth0Id = cfg.testUser.auth0Id
 
-yellow('fixture: auth0Id', auth0Id)
 
 export const fourTodos = [
   {

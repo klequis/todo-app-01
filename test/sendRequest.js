@@ -1,16 +1,32 @@
 import app from 'server'
 import request from 'supertest'
+import { green } from 'logger'
 
 const invalidMethodErrMsg = receivedMethod => {
   return `'method' must be one of ['post', 'delete', 'get', 'patch']. Received ${receivedMethod}`
 }
 
-const sendRequest = async ({ method = '', uri = '', status, body, token }) => {
-  // green('method', method)
-  // green('uri', uri)
-  // green('status', status)
-  // green('body', body)
-  // green('token', token)
+const logSendRequest = (method, uri, status, body, token) =>  {
+  console.log()
+  console.group()
+  green('method', method)
+  green('uri', uri)
+  green('status', status)
+  green('body', body)
+  green('token', token !== undefined)
+  console.groupEnd()
+  console.log()
+}
+
+const sendRequest = async ({ 
+  method = '', 
+  uri = '', 
+  status, 
+  body, 
+  token,
+  contentType=/json/
+ }) => {
+  logSendRequest(method, uri, status, body, token, contentType)
 
   const methodToLower = method.toLowerCase()
 
@@ -25,13 +41,14 @@ const sendRequest = async ({ method = '', uri = '', status, body, token }) => {
   }
 
   if (methodToLower === 'post') {
+    
     const r = await request(app)
       .post(uri)
       .set('Accept', 'application/json')
       .set('Authorization', `Bearer ${token.access_token}`)
       .send(body)
       .expect(status)
-      .expect('Content-Type', /json/)
+      .expect('Content-Type', contentType)
     return r
   }
 

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { fourTodos, patchErrors } from './patchFixture'
+import { fourTodos, auth0UUID } from './fixture'
 import { dropCollection, insertMany } from 'db'
 import getToken from 'test/getToken'
 import sendRequest from 'test/sendRequest'
@@ -12,18 +12,17 @@ import {
   createdAtCheck,
   dueDateCheck,
   lastUpdatedAtCheck,
-  mongoIdCheck,
+  mongoIdInBodyCheck,
+  mongoIdParamsCheck,
   titleLengthCheck,
-  userIdCheck,
+  userIdInBodyCheck,
 } from 'routes/todoRoute/validationChecks'
 
 function patchUri(id) {
-  return `/api/todo/${id}`
+  return `/api/todo/${auth0UUID}/${id}`
 }
 
-function getErrorByParam(param) {}
-
-describe('todoRoute PATCH', function() {
+describe.only('todoRoute PATCH', function() {
   let token = undefined
   before(async function() {
     token = await getToken()
@@ -74,7 +73,7 @@ describe('todoRoute PATCH', function() {
       expect(modifiedTodo.userId).to.equal(newData.userId)
     })
 
-    it('check field validation error messages - missing', async function() {
+    it.only('check field validation error messages - missing', async function() {
       const r = await sendRequest({
         method: 'PATCH',
         uri: patchUri(),
@@ -85,10 +84,10 @@ describe('todoRoute PATCH', function() {
       const { body } = r
       const { errors } = body
       // length
-      expect(errors.length).to.equal(6)
+      // expect(errors.length).to.equal(7)
       // _id
-      expect(findObjectInArray(errors, 'param', 'id').msg).to.equal(
-        mongoIdCheck.errorMessage
+      expect(findObjectInArray(errors, 'param', '_id').msg).to.equal(
+        mongoIdInBodyCheck.errorMessage
       )
       // completed
       expect(findObjectInArray(errors, 'param', 'completed').msg).to.equal(
@@ -110,7 +109,7 @@ describe('todoRoute PATCH', function() {
       )
       // userId
       expect(findObjectInArray(errors, 'param', 'userId').msg).to.equal(
-        userIdCheck.errorMessage
+        userIdInBodyCheck.errorMessage
       )
     })
   })

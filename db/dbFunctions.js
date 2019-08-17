@@ -1,6 +1,9 @@
 import mongodb, { ObjectID } from 'mongodb'
 import { removeIdProp } from 'lib'
 import config from '../config'
+import { hasProp } from 'lib'
+import { mergeRight } from 'ramda'
+import { green } from 'logger'
 
 const MongoClient = mongodb.MongoClient
 
@@ -85,7 +88,7 @@ export const insertOne = async (collection, data) => {
  * @param {string} collection the name of a collection
  * @param {object} filter filter criteria
  * @param {object} project a valid projection
- * @returns {object} { data: [], error: '' } where data is an array of one or more documents
+ * @returns {array} { data: [], error: '' } where data is an array of one or more documents
  *
  */
 export const find = async (collection, filter = {}, project = {}) => {
@@ -95,7 +98,6 @@ export const find = async (collection, filter = {}, project = {}) => {
   // Going to try to always pass back the id as a string and see how it goes
   // ** check other functions where ObjectID may be passed back
   // actuall, maybe I don't care?
-  // blue('filter', filter)
   try {
     const { db } = await connectDB()
     return await db
@@ -163,18 +165,31 @@ export const findOneAndDelete = async (collection, id) => {
  */
 export const findOneAndUpdate = async (
   collection,
-  id,
+  filter={},
   update,
   returnOriginal = false
 ) => {
+  green('collection', collection)
+  green('filter', filter)  
+  green('update', update)
+
   try {
-    // if the filter has the _id prop, remove it
+    // if filter has a string _id it must be converted to ObjectID
+    let _id = undefined
+    if (hasProp('_id', filter)) {
+      const { _id: id } = filter
+      
+      _id = typeof id === 'string' ? ObjectID(id) : id
+    }
+    const newFilter = !(_id === undefined) ? mergeRight(filter, { _id }) : filter
+
+    // if the update has the _id prop, remove it
     const cleanedUpdate = removeIdProp(update)
     const { db } = await connectDB()
     const r = await db
       .collection(collection)
       .findOneAndUpdate(
-        { _id: ObjectID(id) },
+        newFilter,
         { $set: cleanedUpdate },
         { returnOriginal: returnOriginal }
       )

@@ -5,6 +5,7 @@ export {
   dropCollection,
   find,
   findById,
+  findOne,
   findOneAndDelete,
   findOneAndUpdate,
   insertMany,
