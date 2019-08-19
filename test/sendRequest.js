@@ -8,7 +8,7 @@ const invalidMethodErrMsg = receivedMethod => {
 
 const logSendRequest = (method, uri, status, body, token) =>  {
   console.log()
-  console.group()
+  console.group('logSendRequest')
   green('method', method)
   green('uri', uri)
   green('status', status)

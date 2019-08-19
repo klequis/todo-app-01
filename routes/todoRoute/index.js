@@ -3,7 +3,9 @@ import todoGet from './todoGet'
 import todoPost, { postValidationSchema } from './todoPost'
 import todoDelete, { deleteValidationSchema } from './todoDelete'
 import todoGetById, { getByIdValidationSchema } from './todoGetById'
-import todoPatch, { patchValidationSchema } from './todoPatch'
+import todoPatch from './todoPatch'
+import todoPatchSchema from './todoPatchSchema'
+import validateRequest from './validateRequest'
 
 import { patchValidation, cb1 } from './patchValidation'
 
@@ -20,6 +22,12 @@ const heyhey = function(req, res, next) {
 //   next()
 // }
 
+const obj = {
+  msg: 'Hello'
+}
+
+console.log('todopatchschema', todoPatchSchema)
+
 const router = express.Router()
 
 router.delete('/:userid/:todoid', checkSchema(deleteValidationSchema), todoDelete)
@@ -27,7 +35,7 @@ router.get('/:userid', todoGet)
 router.get('/:userid/:todoid', checkSchema(getByIdValidationSchema), todoGetById)
 router.patch('/:userid/:todoid', 
   // checkSchema(patchValidationSchema),
-  patchValidation,
+  validateRequest(todoPatchSchema),
 todoPatch)
 // router.patch('/:id/todoid', todoPatch)
 router.post('/:userid', checkSchema(postValidationSchema), todoPost)

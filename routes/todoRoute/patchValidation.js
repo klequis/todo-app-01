@@ -1,13 +1,11 @@
-import { blue } from "../../logger";
-import { isBoolean, isISO8601 } from 'validator'
-import { map } from 'ramda'
-
+import { blue } from 'logger'
+import { isBoolean, isISO8601, isMongoId } from 'validator'
+import { map, mergeRight } from 'ramda'
+import { stringify } from 'querystring'
 
 // R.map(double, {x: 1, y: 2, z: 3}); //=> {x: 2, y: 4, z: 6}
 
-const addError = (error) => {
-
-}
+const addError = error => {}
 
 // const toString = (value) => {
 //   if (typeof value === 'string') {
@@ -40,14 +38,8 @@ const example = {
   location: ''
 }
 
-const schema = [
-  {
-    field: '_id',
-    location: 'param',
-    dataType: 'boolean',
-    value: '123'
-  }
-]
+
+
 
 
 /*
@@ -59,26 +51,60 @@ OK, you likely want to use Ramda to see
 
 */
 
-export const patchValidation = function(req, res, next) {
-  const { body, params } = req
-  for(let i; i<schema.length; i++) {
-    const {field, location, dataType, value} =  schema[i]
-    let err = {}
-    const { _id } = params
-    switch (dataType) {
-      case 'boolean': 
-        if (!isBoolean(value)) {
-          err = {
-            one: '',
-            two: '',
+/*
+    and you are going to create a validation function 
+    that takes a schema object !!
+ */
+
+//  const check = (rule) => {
+
+//  }
+
+
+
+
+
+const patchValidation2 = function(req, res, next) {
+  return (req, res, next) => obj  => function(req, res, next) {
+    // const { req, res, next } = p
+    
+    const { body, params } = req
+    blue('body', body)
+    blue('params', params)
+    const errors = []
+    for (let i = 0; i < schema.length; i++) {
+      const { field, location, expectedType, value, errorMessage } = schema[i]
+      let err = {}
+      const { _id } = params
+      switch (expectedType) {
+        case 'boolean':
+          if (!isBoolean(value)) {
+            err = createError(schema[i])
           }
-        }
+          break
+        case 'date':
+          if (!isISO8601(value)) {
+            err = createError(schema[i])
+          }
+          break
+        case 'mongoId':
+          if (!isMongoId(value)) {
+            err = createError(schema[i])
+          }
+      }
+      errors.push(err)
     }
+
+    blue('body', typeof body)
+    const newBody = mergeRight(body, { errors })
+    req.body = newBody
+
+    blue('req.body', req.body)
+    next()
   }
-  errors.push(err)
 }
 
-export const patchValidation1 = function(req, res, next) {
+const patchValidation1 = function(req, res, next) {
   const errors = []
   const { body, params } = req
   blue('body', body)
@@ -92,7 +118,6 @@ export const patchValidation1 = function(req, res, next) {
       location: 'body',
       msg: 'completed must be true or false',
       param: 'completed'
-      
     })
   }
   if (!isISO8601(y.createdAt)) {
@@ -102,20 +127,14 @@ export const patchValidation1 = function(req, res, next) {
       msg: 'completed must be true or false',
       param: 'completed'
     })
-  } 
-  
+  }
+
   blue('errors', errors)
 
   next()
-
 }
 
 export const cb1 = function(req, res, next) {
   console.log('CB1')
   next()
 }
-
-
-
-
-

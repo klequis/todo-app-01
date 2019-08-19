@@ -61,6 +61,8 @@ export const logResponse = res => {
 export const logRequest = req => {
   // console.Group('** logRequest **')
   const r = {
+    // method: req.method,
+
     text: req.text,
     body: req.body,
     params: req.params
@@ -71,7 +73,9 @@ export const logRequest = req => {
     // type: req.type,
     // charset: res.charset
   }
-  log(chalk.bgGreen('response'), r)
+  console.log('***************************************');
+  
+  log(chalk.bgGreen('request'), r)
   // if (res.ok) {
   //   log(chalk.bgGreen('response'), r)
   // } else {
