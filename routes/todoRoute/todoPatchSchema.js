@@ -1,24 +1,40 @@
 export default [
   {
     field: '_id',
-    location: 'param',
+    location: 'params',
     expectedType: 'mongoId',
     errorMessage: 'todoid must be a valid MongodDB ObjectID as string',
-    value: '123'
   },
 
+  {
+    field: '_id',
+    location: 'body',
+    expectedType: 'mongoId',
+    errorMessage: 'todoid must be a valid MongodDB ObjectID as string',
+  },
   {
     field: 'completed',
     location: 'body',
     expectedType: 'boolean',
     errorMessage: 'completed must be boolean / true or false',
-    value: '3'
   },
   {
     field: 'createdAt',
     location: 'body',
     expectedType: 'date',
     errorMessage: 'createdAt must be an ISODateString',
-    value: '456'
+  },
+  {
+    field: 'userId',
+    location: 'body',
+    expectedType: 'string',
+    errorMessage: 'userId must be a string'
   }
+  // {
+  //   field: 'dueDate',
+  //   location: 'body',
+  //   expectedType: 'date',
+  //   errorMessage: 'createdAt must be an ISODateString',
+  // }
+
 ]
