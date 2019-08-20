@@ -36,7 +36,7 @@ describe.only('todoRoute PATCH', function() {
       idToUpdate1 = inserted[1]._id.toString()
       idToUpdate2 = inserted[2]._id.toString()
     })
-    it('all fields valid - should return document with updated title, completed & lastUpdateAt', async function() {
+    it.only('all fields valid - should return document with updated title, completed & lastUpdateAt', async function() {
       // use fourTodos[1]
       const originalTodo = fourTodos[1]
       const newData = mergeRight(originalTodo, {

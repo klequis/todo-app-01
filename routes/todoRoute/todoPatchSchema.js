@@ -1,6 +1,6 @@
 export default [
   {
-    field: '_id',
+    field: 'todoid',
     location: 'params',
     expectedType: 'mongoId',
     errorMessage: 'todoid must be a valid MongodDB ObjectID as string'
@@ -28,7 +28,22 @@ export default [
     field: 'dueDate',
     location: 'body',
     expectedType: 'date',
-    errorMessage: 'dueDate must be an ISODateString'
+    errorMessage: 'dueDate must be an ISODateString',
+    required: false,
+  },
+  {
+    field: 'lastUpdatedAt',
+    location: 'body',
+    expectedType: 'date',
+    errorMessage: 'lastUpdatedAt must be an ISODateString'
+  },
+  {
+    field: 'title',
+    location: 'body',
+    expectedType: 'string',
+    rules: {
+      minLength: 2
+    }
   },
   {
     field: 'userId',

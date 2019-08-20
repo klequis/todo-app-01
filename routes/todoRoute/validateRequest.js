@@ -42,6 +42,35 @@ const getValueFromBody = (field, body) => {
   return r[field] || undefined
 }
 
+const checkType = (expectedType, value) => {
+  const valueToCheck = toString(value)
+  // blue('valueToCheck', valueToCheck)
+  let err = undefined
+
+  switch (expectedType) {
+    case 'boolean':
+      if (!isBoolean(valueToCheck)) {
+        err = createError(schema[i], valueToCheck)
+      }
+      break
+    case 'date':
+      if (!isISO8601(valueToCheck)) {
+        err = createError(schema[i], valueToCheck)
+      }
+      break
+    case 'mongoId':
+      blue('case mongoId', typeof valueToCheck)
+      if (!isMongoId(valueToCheck)) {
+        blue('!isMongoId')
+        err = createError(schema[i], valueToCheck)
+        blue('!isMongoId: err', err)
+      }
+    default:
+      throw new Error(`validateRequest.checkType ERROR: unknown expectedType: ${expectedType}`)
+  }
+  return err
+}
+
 const validateRequest = schema => {
   return (req, res, next) => {
     const { body, params } = req
@@ -52,8 +81,8 @@ const validateRequest = schema => {
     for (let i = 0; i < schema.length; i++) {
       const { field, location, expectedType, errorMessage } = schema[i]
       let err = undefined
-      const { _id } = params
       // blue('location', location)
+      blue('params', params)
       const fieldValue =
         location === 'params'
           ? getValueFromParams(field, params)
@@ -61,34 +90,17 @@ const validateRequest = schema => {
 
       // blue('valueToCheck', fieldValue)
       if (fieldValue === undefined) {
-        err = createError(schema[i], fieldValue)
-      } else {
-        const valueToCheck = toString(fieldValue)
-        // blue('valueToCheck', valueToCheck)
-        switch (expectedType) {
-          case 'boolean':
-            if (!isBoolean(valueToCheck)) {
-              err = createError(schema[i], valueToCheck)
-            }
-            break
-          case 'date':
-            if (!isISO8601(valueToCheck)) {
-              err = createError(schema[i], valueToCheck)
-            }
-            break
-          case 'mongoId':
-            blue('case mongoId', typeof valueToCheck)
-            if (!isMongoId(valueToCheck)) {
-              blue('!isMongoId')
-              err = createError(schema[i], valueToCheck)
-              blue('!isMongoId: err', err)
-            }
+
+        if (schema[i].required === undefined || schema[i].required) {
+          err = createError(schema[i], fieldValue)
         }
+        
+      } else {
+
       }
       if (!(err === undefined)) {
         errors.push(err)
       }
-      
     }
     blue('errors', errors)
     // blue('body', typeof body)
@@ -98,7 +110,7 @@ const validateRequest = schema => {
     // blue('req.body', req.body)
     blue('errors.length', errors.length)
     if (errors.length > 0) {
-     return res.status(422).json({ errors })
+      return res.status(422).json({ errors })
     } else {
       next()
     }
