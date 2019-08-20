@@ -2,8 +2,21 @@ import { blue } from 'logger'
 import { isBoolean, isISO8601, isMongoId } from 'validator'
 import { map, mergeRight, pick } from 'ramda'
 
+const toString = (value, deep = true) => {
+  if (Array.isArray(value) && value.length && deep) {
+    return toString(value[0], false)
+  } else if (value instanceof Date) {
+    return value.toISOString()
+  } else if (value && typeof value === 'object' && value.toString) {
+    return value.toString()
+  } else if (value == null || (isNaN(value) && !value.length)) {
+    return ''
+  }
+
+  return String(value)
+}
+
 const createError = (rule, value) => {
-  blue('*************** value', value)
   const { field, location, expectedType, errorMessage } = rule
   return {
     field: field,
@@ -16,14 +29,14 @@ const createError = (rule, value) => {
 }
 
 const getValueFromParams = (field, params) => {
-  blue('findInParams', { field, params })
+  // blue('findInParams', { field, params })
   const r = pick([field], params)
 
   return r[field] || undefined
 }
 
 const getValueFromBody = (field, body) => {
-  blue('findInBody', { field, body })
+  // blue('findInBody', { field, body })
   const r = pick([field], body)
 
   return r[field] || undefined
@@ -32,23 +45,26 @@ const getValueFromBody = (field, body) => {
 const validateRequest = schema => {
   return (req, res, next) => {
     const { body, params } = req
+    const stringBody = map(toString, body)
     // blue('params', params)
     const errors = []
 
     for (let i = 0; i < schema.length; i++) {
-      const { field, location, expectedType, value, errorMessage } = schema[i]
-      let err = {}
+      const { field, location, expectedType, errorMessage } = schema[i]
+      let err = undefined
       const { _id } = params
-      blue('location', location)
-      const valueToCheck =
+      // blue('location', location)
+      const fieldValue =
         location === 'params'
           ? getValueFromParams(field, params)
-          : getValueFromBody(field, body)
+          : getValueFromBody(field, stringBody)
 
-      blue('valueToCheck', valueToCheck)
-      if (valueToCheck === undefined) {
-        err = createError(schema[i], valueToCheck)
+      // blue('valueToCheck', fieldValue)
+      if (fieldValue === undefined) {
+        err = createError(schema[i], fieldValue)
       } else {
+        const valueToCheck = toString(fieldValue)
+        // blue('valueToCheck', valueToCheck)
         switch (expectedType) {
           case 'boolean':
             if (!isBoolean(valueToCheck)) {
@@ -61,18 +77,26 @@ const validateRequest = schema => {
             }
             break
           case 'mongoId':
+            blue('case mongoId', typeof valueToCheck)
             if (!isMongoId(valueToCheck)) {
+              blue('!isMongoId')
               err = createError(schema[i], valueToCheck)
+              blue('!isMongoId: err', err)
             }
         }
       }
-      errors.push(err)
+      if (!(err === undefined)) {
+        errors.push(err)
+      }
+      
     }
+    blue('errors', errors)
     // blue('body', typeof body)
     // const newBody = mergeRight(body, { errors })
     // req.body = newBody
 
     // blue('req.body', req.body)
+    blue('errors.length', errors.length)
     if (errors.length > 0) {
      return res.status(422).json({ errors })
     } else {

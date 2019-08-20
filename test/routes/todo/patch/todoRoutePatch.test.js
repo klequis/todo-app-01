@@ -44,7 +44,7 @@ describe.only('todoRoute PATCH', function() {
         title: 'changed title',
         completed: true
       })
-      yellow('newData', newData)
+      // yellow('newData', newData)
       const r = await sendRequest({
         method: 'PATCH',
         uri: patchUri(newData._id),
