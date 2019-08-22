@@ -26,7 +26,6 @@ const obj = {
   msg: 'Hello'
 }
 
-console.log('todopatchschema', todoPatchSchema)
 
 const router = express.Router()
 

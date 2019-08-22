@@ -1,55 +1,62 @@
-export default [
-  {
-    field: 'todoid',
-    location: 'params',
-    expectedType: 'mongoId',
-    errorMessage: 'todoid must be a valid MongodDB ObjectID as string'
-  },
+import {
+  typeMongoIdString,
+  typeBoolean,
+  typeISODateString,
+  typeString,
+  typeUUID,
+} from 'routes/todoRoute/validateRequest'
 
+
+export default [
   {
     field: '_id',
     location: 'body',
-    expectedType: 'mongoId',
-    errorMessage: 'todoid must be a valid MongodDB ObjectID as string'
+    expectedType: typeMongoIdString
   },
   {
     field: 'completed',
     location: 'body',
-    expectedType: 'boolean',
-    errorMessage: 'completed must be boolean / true or false'
+    expectedType: typeBoolean
   },
   {
     field: 'createdAt',
     location: 'body',
-    expectedType: 'date',
-    errorMessage: 'createdAt must be an ISODateString'
+    expectedType: typeISODateString
   },
   {
     field: 'dueDate',
     location: 'body',
-    expectedType: 'date',
-    errorMessage: 'dueDate must be an ISODateString',
-    required: false,
+    expectedType: typeISODateString,
+    // required: false
   },
   {
     field: 'lastUpdatedAt',
     location: 'body',
-    expectedType: 'date',
-    errorMessage: 'lastUpdatedAt must be an ISODateString'
+    expectedType: typeISODateString
+  },
+  {
+    field: 'todoid',
+    location: 'params',
+    expectedType: typeMongoIdString
   },
   {
     field: 'title',
     location: 'body',
-    expectedType: 'string',
+    expectedType: typeString,
     rules: {
-      minLength: 2
+      minLength: 2,
+      maxLength: 30
     }
   },
   {
     field: 'userId',
     location: 'body',
-    expectedType: 'string',
-    errorMessage: 'userId must be a string'
+    expectedType: typeUUID
+  },
+  {
+    field: 'userid',
+    location: 'params',
+    expectedType: typeUUID
   }
   // {
   //   field: 'dueDate',
