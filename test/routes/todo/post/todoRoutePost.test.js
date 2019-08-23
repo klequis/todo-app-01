@@ -15,9 +15,6 @@ import { differenceInMilliseconds } from 'date-fns'
 
 import { yellow } from 'logger'
 
-const titleTooShortMsg = 'Title must be at least 3 characters long.'
-
-const unknownUser = 'Unknown user.' // also used for not valid
 
 const postUri = `/api/todo/${auth0UUID}`
 
@@ -37,7 +34,7 @@ function diffDateTime(date1, date2) {
   return differenceInMilliseconds(new Date(d1), new Date(d2))
 }
 
-describe('todoRoute POST', function() {
+describe.only('todoRoute POST', function() {
   let token = undefined
 
   before(async function() {

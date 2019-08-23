@@ -1,14 +1,6 @@
 import wrap from 'routes/wrap'
-import { validationResult } from 'express-validator'
 import { insertOne } from 'db'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
-import {
-  dueDateCheck,
-  titleLengthCheck,
-  userIdInBodyCheck,
-  userIdInParamsCheck
-} from './validationChecks'
-
 import { green, logRequest } from 'logger'
 
 /**
@@ -20,12 +12,6 @@ import { green, logRequest } from 'logger'
 const todoPost = wrap(async (req, res) => {
   green('**POST')
   logRequest(req)
-  const errors = validationResult(req)
-
-  if (!errors.isEmpty()) {
-    green('post Errors', errors)
-    return res.status(422).json({ errors: errors.array() })
-  }
 
   const { body, params } = req
 
@@ -50,10 +36,3 @@ const todoPost = wrap(async (req, res) => {
 })
 
 export default todoPost
-
-export const postValidationSchema = {
-  title: titleLengthCheck,
-  dueDate: dueDateCheck,
-  userId: userIdInBodyCheck,
-  userid: userIdInParamsCheck
-}

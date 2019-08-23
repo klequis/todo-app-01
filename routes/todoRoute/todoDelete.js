@@ -1,5 +1,4 @@
 import wrap from 'routes/wrap'
-import { validationResult } from 'express-validator'
 import { findOneAndDelete } from 'db'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 

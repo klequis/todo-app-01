@@ -7,17 +7,6 @@ import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { mergeRight } from 'ramda'
 import { yellow, redf } from 'logger'
 import { isDateTimeAfter, findObjectInArray } from 'lib'
-import {
-  completedCheck,
-  createdAtCheck,
-  dueDateCheck,
-  lastUpdatedAtCheck,
-  mongoIdInBodyCheck,
-  mongoIdParamsCheck,
-  titleLengthCheck,
-  userIdInBodyCheck,
-} from 'routes/todoRoute/validationChecks'
-
 
 function patchUri(id) {
   return `/api/todo/${auth0UUID}/${id}`
@@ -76,7 +65,7 @@ describe('todoRoute PATCH', function() {
     })
 
     
-    it.only('invalid _id, invalid userId, all others missing', async function() {
+    it('invalid _id, invalid userId, all others missing', async function() {
       // (3) invalid fields: _id, todoid, userId
       // (3) missing fields: completed, createdAt, lastUpdatedAt
       // (1) valid fields: userid
@@ -99,50 +88,23 @@ describe('todoRoute PATCH', function() {
       const { body } = r
 
       const { errors } = body
-      // yellow('errors', errors)
+      yellow('errors', errors)
       // // length
-      const errorFields = ['_id', 'todoid', 'userId', 'completed', 'createdAt', 'lastUpdatedAt']
+      expect(errors.length).to.equal(8)
+      // check all expected errors are returned
+      const errorFields = ['_id', 'todoid', 'completed', 'createdAt', 'lastUpdatedAt']
       errorFields.forEach(field => {
 
-        const o = findObjectInArray(errors, 'field', field)
-        // yellow('o', typeof o)
+        const o = findObjectInArray(errors, 'param', field)
+        // Log out any fields that are missing
         if (typeof o === 'undefined') {
           console.group()
           console.log()
           redf(`field ${field} is undefined`)
           console.log()
         }
-        
         expect(typeof o).to.equal('object')
-        // yellow('o', o.field)
       })
-      expect(errors.length).to.equal(7)
-      // // _id
-      // expect(findObjectInArray(errors, 'param', '_id').msg).to.equal(
-      //   mongoIdInBodyCheck.errorMessage
-      // )
-      // // completed
-      // expect(findObjectInArray(errors, 'param', 'completed').msg).to.equal(
-      //   completedCheck.errorMessage
-      // )
-      // // createdAt
-      // expect(
-      //   findObjectInArray(errors, 'param', 'createdAt').msg
-      // ).to.equal(createdAtCheck.errorMessage)
-      // // dueDate - is optional so no error will be found
-      // expect(findObjectInArray(errors, 'param', 'dueDate')).to.equal(undefined)
-      // // lastUpdatedAt
-      // expect(findObjectInArray(errors, 'param', 'lastUpdatedAt').msg).to.equal(
-      //   lastUpdatedAtCheck.errorMessage
-      // )
-      // // title
-      // expect(findObjectInArray(errors, 'param', 'title').msg).to.equal(
-      //   titleLengthCheck.errorMessage
-      // )
-      // // userId
-      // expect(findObjectInArray(errors, 'param', 'userId').msg).to.equal(
-      //   userIdInBodyCheck.errorMessage
-      // )
     })
   })
 })

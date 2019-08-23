@@ -1,10 +1,6 @@
 import wrap from 'routes/wrap'
-import { validationResult } from 'express-validator'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { findById } from 'db'
-
-
-
 
 
 /**
