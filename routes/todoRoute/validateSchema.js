@@ -1,5 +1,6 @@
 import { map, without } from 'ramda'
 import { isEmpty } from 'validator'
+import { hasProp } from 'lib'
 
 export const typeMongoIdString = 'mongoId'
 export const typeBoolean = 'boolean'
@@ -9,26 +10,24 @@ export const typeUUID = 'uuid'
 
 const schemaFields = ['field', 'location', 'expectedType', 'required']
 
-
-const checkFieldSchema = schema => {
-  const keys = Object.keys(schema)
+const checkFieldSchema = schemaField => {
+  const keys = Object.keys(schemaField)
+  
   const fieldsToCheck = keys.includes('required')
     ? schemaFields
     : without(['required'], schemaFields)
+
   fieldsToCheck.forEach(f => {
     if (!keys.includes(f)) {
       throw new Error(`A valid schema must include a '${f}' property.`)
     }
-    if (isEmpty(schema[f])) {
+    if (isEmpty(schemaField[f])) {
       throw new Error(`Schema property '${f}' has no value.`)
     }
   })
 }
 
 const validateSchema = schema => {
-  if (!Array.isArray(schema)) {
-    throw new Error(`Schama must be an array. Received ${typeof schema}`)
-  }
 
   schema.forEach(s => {
     const s1 = map(toString, s)

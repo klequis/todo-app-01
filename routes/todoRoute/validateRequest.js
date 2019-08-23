@@ -1,5 +1,5 @@
 import { isBoolean, isISO8601, isMongoId, isUUID, isLength } from 'validator'
-import { pick } from 'ramda'
+import { concat, pick } from 'ramda'
 import { toString } from 'lib'
 import { blue, yellow, red, greenf, redf, green } from 'logger'
 import validateSchema, {
@@ -9,20 +9,6 @@ import validateSchema, {
   typeString,
   typeUUID
 } from './validateSchema'
-
-const createTypeErrorMessage = (expectedType, field) => {
-  return `${field} must be ${expectedType}`
-  // switch (expectedType) {
-  //   case typeMongoIdString:
-  //     return `${field} must be a valid MongodDB ObjectID as string.`
-  //   case typeBoolean:
-  //     return `${field} must be a boolean value.`
-  //   case typeISODateString:
-  //     return `${field} must be an ISODateString.`
-  //   case typeString:
-  //     return `${field} must be a string.`
-  // }
-}
 
 /**
  * @description creates error objects for type errors or rule errors
@@ -61,51 +47,22 @@ const getValueFromBody = (field, body) => {
   return r[field] || undefined
 }
 
-/**
- *
- * @param {object} fieldSchema
- * @param {any} fieldValueRaw
- * @returns error from createError() || undefined err only one error
- */
-const checkType = (fieldSchema, fieldValueRaw) => {
-  // blue('checkType: fieldSchema.field', fieldSchema.field)
-  // blue('checkType: fieldValueRaw', fieldValueRaw)
-  const fieldValueAsString = toString(fieldValueRaw)
+const checkType = (fieldSchema, fieldValueAsString) => {
   const { expectedType } = fieldSchema
-  // blue('fieldSchema', fieldSchema)
-  let isErr = false
   switch (expectedType) {
     case typeBoolean:
-      if (!isBoolean(fieldValueAsString)) {
-        yellow('err isBoolean')
-        isErr = true
-        // err = createTypeError(fieldSchema, fieldValueAsString)
-        // err = createError(fieldSchema, {} , fieldValueAsString, 'it should be a boolean')
-      }
-      break
+      return isBoolean(fieldValueAsString)
     case typeISODateString:
-      if (!isISO8601(fieldValueAsString)) {
-        yellow('err isISO8601')
-        isErr = true
-      }
-      break
+      return isISO8601(fieldValueAsString)
     case typeMongoIdString:
-      if (!isMongoId(fieldValueAsString)) {
-        yellow('err isMongoId')
-        isErr = true
-      }
-      break
+      return isMongoId(fieldValueAsString)
     case typeUUID:
-      if (!isUUID(fieldValueAsString, 4)) {
-        yellow('err isUUID')
-        isErr = true
-      }
-      break
+      return isUUID(fieldValueAsString, 4)
     case typeString:
       // since valueToCheck was converted to string above
-      // don't need to check for string here
+      // a check for isString here would always be true
       // strings will be further evaluated in checkRules()
-      break
+      return true
 
     default:
       red('unknown type', expectedType)
@@ -113,21 +70,54 @@ const checkType = (fieldSchema, fieldValueRaw) => {
     //   `validateRequest.checkType ERROR: unknown expectedType: ${expectedType}`
     // )
   }
-  if (isErr) {
-    return createError({
-      fieldSchema,
-      valueReceived: fieldValueAsString,
-      errorMessage: createTypeErrorMessage(fieldSchema, fieldValueAsString)
-    })
-  }
-  return undefined
 }
 
-const minLength = (value, length) => {
-  if (!isLength(value, { min: length })) {
-    return `minLenght must be ${length}`
-  } else {
-    return 'it was Ok'
+/**
+ *
+ * @param {object} fieldSchema
+ * @param {any} fieldValueRaw
+ * @returns error from createError() || undefined err only one error
+ */
+const checkTypes = ({ schema, body, params }) => {
+  const { location, field } = schema
+  const value =
+    location === 'params'
+      ? getValueFromParams(field, params)
+      : getValueFromBody(field, body)
+  const fieldValue = toString(value)
+  
+  return schema
+    .map(fieldSchema => {
+      const check = checkType(fieldSchema, fieldValue)
+      const { expectedType } = fieldSchema
+      return !check
+        ? createError({
+            fieldSchema,
+            valueReceived: fieldValue,
+            errorMessage: `Field ${field} must be of type ${expectedType}`
+          })
+        : undefined
+    })
+    .filter(i => i !== undefined)
+}
+
+const getFieldValue = (fieldSchema, body, params) => {
+  const { field, location } = fieldSchema
+  return location === 'params'
+    ? getValueFromParams(field, params)
+    : getValueFromBody(field, body)
+}
+
+const checkRule = (rule, ruleValue, field, receivedValue) => {
+  switch (rule) {
+    case 'minLength':
+      return isLength(toString(receivedValue), { min: ruleValue })
+        ? ''
+        : `Field ${field} must be at least ${ruleValue} characters. Received ${receivedValue}.`
+
+    default:
+      // TODO: throw an error here
+      return ''
   }
 }
 
@@ -138,43 +128,45 @@ const minLength = (value, length) => {
  *
  * @returns array of errors
  */
-const checkRules = (fieldSchema, fieldValueRaw) => {
-  const { rules } = fieldSchema
-  if (rules === undefined) {
-    return undefined
-  }
+const checkRules = ({ schema, body, params }) => {
+  const errors = schema.map(fieldSchema => {
+    // blue('fieldSchema', fieldSchema)
+    const rules = fieldSchema.rules || []
 
-  // TODO: this should be in validateSchema
-  if (typeof rules !== 'object' || Array.isArray(rules)) {
-    throw new Error('rules poperty of fieldSchema must be an object')
-  }
-  // TODO
-  const keys = Object.keys(rules)
-  const errors = keys.map(rule => {
-    const ruleValue = rules[rule]
-    const { field } = fieldSchema
-    switch (rule) {
-      case 'minLength':
-        const msg = minLength(toString(fieldValueRaw), ruleValue)
+    const errs = Object.keys(rules)
+      .map(rule => {
+        // blue('** rule', rule)
 
-        if (msg !== '') {
-          // blue('*********** msg', msg)
-          // err = createRuleError(fieldSchema, rule, fieldValueRaw, ruleValue, msg)
-          return createError({
-            fieldSchema,
-            rule,
-            valueReceived: fieldValueRaw || '',
-            errorMessage: `Field ${field} must be at least ${ruleValue} characters.`
-          })
-        }
+        const ruleValue = rules[rule]
+        // blue('** ruleValue', ruleValue)
 
-      default:
-      // do nothing for now
-    }
-  }).filter(e => e !== undefined)
+        const receivedValue = getFieldValue(fieldSchema, body, params)
+        // blue('** receivedValue', receivedValue)
 
-  // blue('checkRules: errors', errors)
-  return errors
+        const { field } = fieldSchema
+        // blue('** field', field)
+
+        const msg = checkRule(rule, ruleValue, field, receivedValue)
+        // blue('** msg', msg)
+
+        return msg !== ''
+          ? createError({
+              fieldSchema,
+              rule,
+              valueReceived: receivedValue || '',
+              errorMessage: msg
+            })
+          : undefined
+      })
+      .filter(i => i !== undefined)
+      // blue('errs', errs)
+      return errs
+  })
+
+  return errors.reduce(function(accumulator, currentValue) {
+    return accumulator.concat(currentValue)
+  }, [])
+
 }
 
 const shouldProcess = (fieldSchema, fieldValueRaw) => {
@@ -194,37 +186,39 @@ const validateRequest = schema => {
 
     // const stringBody = map(toString, body)
     blue('body', body)
-    // blue('params', params)
+    blue('params', params)
 
     let numNoError = 0
     let numWithError = 0
 
-    // could I do this wil map and return an array
-    // to avoid mutating errors with push()
-    const errors = schema.map(fieldSchema => {
-      const { field, location } = fieldSchema
-      const fieldValueRaw =
-        location === 'params'
-          ? getValueFromParams(field, params)
-          : getValueFromBody(field, body)
+    // Types
+    const typeErrs = checkTypes({ schema, body, params })
+    const ruleErrs = checkRules({ schema, body, params })
+    // blue('typeErrs', typeErrs)
+    // blue('ruleErrs', ruleErrs)
+    const errors = [...typeErrs, ...ruleErrs]
+    blue('errors', errors)
+    
+    // const errors = schema.map(fieldSchema => {
+    //   const { field, location } = fieldSchema
 
-      const process = shouldProcess(fieldSchema, fieldValueRaw)
-      // yellow(`process=${process}, field=${field}, fieldValueRaw=${fieldValueRaw} type=${typeof fieldValueRaw}`)
+    //   const process = shouldProcess(fieldSchema, fieldValueRaw)
+    //   // yellow(`process=${process}, field=${field}, fieldValueRaw=${fieldValueRaw} type=${typeof fieldValueRaw}`)
 
-      let typeErr
-      let ruleErrs
+    //   let typeErr
+    //   let ruleErrs
 
-      if (process) {
-        typeErr = checkType(fieldSchema, fieldValueRaw)
-        ruleErrs = checkRules(fieldSchema, fieldValueRaw)
-      }
-      // blue('typeErr', typeErr)
-      blue('ruleErrs', ...[ruleErrs])
-      return []
-    })
+    //   if (process) {
+    //
+    //
+    //   }
+    //   // blue('typeErr', typeErr)
+    //   blue('ruleErrs', ...[ruleErrs])
+    //   return []
+    // })
 
     // blue('errors', errors)
-    return res.status(422).json({ errors })
+    return res.status(422).json({})
 
     console.group('Number processed check')
     console.log()
