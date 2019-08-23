@@ -91,7 +91,8 @@ describe('todoRoute PATCH', function() {
         status: 422,
         body: { 
           _id: '123',
-          userId: '123' 
+          userId: '123',
+          title: 'This title is more than 30 characters long.'
         },
         token
       })
