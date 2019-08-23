@@ -4,7 +4,7 @@ import {
   typeISODateString,
   typeString,
   typeUUID,
-} from 'routes/todoRoute/validateRequest'
+} from 'routes/todoRoute/validateSchema'
 
 
 export default [
@@ -24,10 +24,10 @@ export default [
     expectedType: typeISODateString
   },
   {
-    field: 'dueDate',
+    field: 'dueDate', 
     location: 'body',
     expectedType: typeISODateString,
-    // required: false
+    required: false
   },
   {
     field: 'lastUpdatedAt',

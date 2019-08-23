@@ -23,7 +23,7 @@ function patchUri(id) {
   return `/api/todo/${auth0UUID}/${id}`
 }
 
-describe.only('todoRoute PATCH', function() {
+describe('todoRoute PATCH', function() {
   let token = undefined
   before(async function() {
     token = await getToken()
@@ -78,9 +78,10 @@ describe.only('todoRoute PATCH', function() {
     
     it.only('invalid _id, invalid userId, all others missing', async function() {
       // (3) invalid fields: _id, todoid, userId
-      // (4) missing fields: completed, createdAt, dueDate, lastUpdatedAt
+      // (3) missing fields: completed, createdAt, lastUpdatedAt
       // (1) valid fields: userid
       // (1) other: title
+      // (1) dueDate
       // totoal fields: 9
       // errors: 7
 
@@ -99,11 +100,11 @@ describe.only('todoRoute PATCH', function() {
       const { errors } = body
       // yellow('errors', errors)
       // // length
-      const errorFields = ['_id', 'todoid', 'userId', 'completed', 'createdAt', 'dueDate', 'lastUpdatedAt']
+      const errorFields = ['_id', 'todoid', 'userId', 'completed', 'createdAt', 'lastUpdatedAt']
       errorFields.forEach(field => {
 
         const o = findObjectInArray(errors, 'field', field)
-        yellow('o', typeof o)
+        // yellow('o', typeof o)
         if (typeof o === 'undefined') {
           console.group()
           console.log()
