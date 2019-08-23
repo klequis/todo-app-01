@@ -28,19 +28,19 @@ const createTypeErrorMessage = (expectedType, field) => {
  * @description creates error objects for type errors or rule errors
  *   if type error, rule === undefiend
  *   if rule error, rule === { property: value }
- * @param {*} fieldSchema 
+ * @param {*} fieldSchema
  * @param {*} rule eg., { minLength: 2 }
  * @param {*} valueReceived value received from the client
  * @param {*} errorMessage error message to send to the client
  */
 
 const createError = ({
-  fieldSchema, 
-  rule = undefined, 
-  valueReceived, 
+  fieldSchema,
+  rule = undefined,
+  valueReceived,
   errorMessage
 }) => {
-  const { field, location, expectedType} = fieldSchema
+  const { field, location, expectedType } = fieldSchema
   return {
     field: field,
     location: location,
@@ -62,9 +62,9 @@ const getValueFromBody = (field, body) => {
 }
 
 /**
- * 
- * @param {object} fieldSchema 
- * @param {any} fieldValueRaw 
+ *
+ * @param {object} fieldSchema
+ * @param {any} fieldValueRaw
  * @returns error from createError() || undefined err only one error
  */
 const checkType = (fieldSchema, fieldValueRaw) => {
@@ -72,8 +72,7 @@ const checkType = (fieldSchema, fieldValueRaw) => {
   // blue('checkType: fieldValueRaw', fieldValueRaw)
   const fieldValueAsString = toString(fieldValueRaw)
   const { expectedType } = fieldSchema
-  blue('fieldSchema', fieldSchema)
-  let err = undefined
+  // blue('fieldSchema', fieldSchema)
   let isErr = false
   switch (expectedType) {
     case typeBoolean:
@@ -82,7 +81,6 @@ const checkType = (fieldSchema, fieldValueRaw) => {
         isErr = true
         // err = createTypeError(fieldSchema, fieldValueAsString)
         // err = createError(fieldSchema, {} , fieldValueAsString, 'it should be a boolean')
-        
       }
       break
     case typeISODateString:
@@ -126,23 +124,21 @@ const checkType = (fieldSchema, fieldValueRaw) => {
 }
 
 const minLength = (value, length) => {
-  if (!isLength(value, {min: length})) {
+  if (!isLength(value, { min: length })) {
     return `minLenght must be ${length}`
   } else {
     return 'it was Ok'
   }
-} 
+}
 
 /**
- * 
- * @param {*} rules 
- * @param {*} fieldValueRaw 
- * 
+ *
+ * @param {*} rules
+ * @param {*} fieldValueRaw
+ *
  * @returns array of errors
  */
 const checkRules = (fieldSchema, fieldValueRaw) => {
-  const errors = []
-  // blue('rules', typeof rules)
   const { rules } = fieldSchema
   if (rules === undefined) {
     return undefined
@@ -153,39 +149,31 @@ const checkRules = (fieldSchema, fieldValueRaw) => {
     throw new Error('rules poperty of fieldSchema must be an object')
   }
   // TODO
-
-  Object.keys(rules).forEach(rule => {
-    let err = undefined
-    
+  const keys = Object.keys(rules)
+  const errors = keys.map(rule => {
     const ruleValue = rules[rule]
-    blue('rule', `rule: ${rule}, value ${ruleValue}`)
     const { field } = fieldSchema
     switch (rule) {
-      
       case 'minLength':
-        
         const msg = minLength(toString(fieldValueRaw), ruleValue)
-        
+
         if (msg !== '') {
           // blue('*********** msg', msg)
           // err = createRuleError(fieldSchema, rule, fieldValueRaw, ruleValue, msg)
-          err = createError({
+          return createError({
             fieldSchema,
             rule,
-            valueReceived: fieldValueRaw,
-            errorMessage: `${field} must be at least ${fieldValueRaw} characters.`
+            valueReceived: fieldValueRaw || '',
+            errorMessage: `Field ${field} must be at least ${ruleValue} characters.`
           })
         }
-        
+
       default:
-        // do nothing for now
+      // do nothing for now
     }
-    if (err !== undefined) {
-      errors.push(err)
-    }
-    
-  })
-  blue('checkRules: errors', errors)
+  }).filter(e => e !== undefined)
+
+  // blue('checkRules: errors', errors)
   return errors
 }
 
@@ -207,16 +195,13 @@ const validateRequest = schema => {
     // const stringBody = map(toString, body)
     blue('body', body)
     // blue('params', params)
-    const errors = []
 
     let numNoError = 0
     let numWithError = 0
 
-
     // could I do this wil map and return an array
     // to avoid mutating errors with push()
-    schema.forEach(fieldSchema => {
-      let err = undefined // Q
+    const errors = schema.map(fieldSchema => {
       const { field, location } = fieldSchema
       const fieldValueRaw =
         location === 'params'
@@ -225,25 +210,21 @@ const validateRequest = schema => {
 
       const process = shouldProcess(fieldSchema, fieldValueRaw)
       // yellow(`process=${process}, field=${field}, fieldValueRaw=${fieldValueRaw} type=${typeof fieldValueRaw}`)
-      
-      
+
+      let typeErr
+      let ruleErrs
+
       if (process) {
-        // blue('> processing ...')
-
-        const typeErr = checkType(fieldSchema, fieldValueRaw)
-        const ruleErrs = checkRules(fieldSchema, fieldValueRaw)
-
-        // blue('numErrors', errors.length)
-        console.log()
+        typeErr = checkType(fieldSchema, fieldValueRaw)
+        ruleErrs = checkRules(fieldSchema, fieldValueRaw)
       }
+      // blue('typeErr', typeErr)
+      blue('ruleErrs', ...[ruleErrs])
+      return []
+    })
 
-      if ((err = undefined)) {
-        numNoError++
-      } else {
-        numWithError++
-      }
-      
-    }) // ends the forEach
+    // blue('errors', errors)
+    return res.status(422).json({ errors })
 
     console.group('Number processed check')
     console.log()
@@ -261,8 +242,8 @@ const validateRequest = schema => {
     console.groupEnd()
 
     blue('errors', errors)
-    // return res.status(422).json({ errors })
-    const errors = [...typeErr, ...ruleErrs]
+
+    // const errors = [...typeErr, ...ruleErrs]
     if (errors.length > 0) {
       return res.status(422).json({
         errors
@@ -275,9 +256,77 @@ const validateRequest = schema => {
 
 export default validateRequest
 
-
-
-
+const errors = [
+  [
+    {
+      field: '_id',
+      location: 'body',
+      expectedType: 'mongoId',
+      rule: '',
+      valueReceived: '123',
+      errorMessage: '123 must be [object Object]'
+    },
+    undefined
+  ],
+  [
+    {
+      field: 'completed',
+      location: 'body',
+      expectedType: 'boolean',
+      rule: '',
+      valueReceived: '',
+      errorMessage: ' must be [object Object]'
+    },
+    undefined
+  ],
+  [
+    {
+      field: 'createdAt',
+      location: 'body',
+      expectedType: 'isoDateString',
+      rule: '',
+      valueReceived: '',
+      errorMessage: ' must be [object Object]'
+    },
+    undefined
+  ],
+  [undefined, undefined],
+  [
+    {
+      field: 'lastUpdatedAt',
+      location: 'body',
+      expectedType: 'isoDateString',
+      rule: '',
+      valueReceived: '',
+      errorMessage: ' must be [object Object]'
+    },
+    undefined
+  ],
+  [
+    {
+      field: 'todoid',
+      location: 'params',
+      expectedType: 'mongoId',
+      rule: '',
+      valueReceived: 'undefined',
+      errorMessage: 'undefined must be [object Object]'
+    },
+    undefined
+  ],
+  [undefined, [[Object]]],
+  [
+    {
+      field: 'userId',
+      location: 'body',
+      expectedType: 'uuid',
+      rule: '',
+      valueReceived: '123',
+      errorMessage: '123 must be [object Object]'
+    },
+    undefined
+  ],
+  [undefined, undefined]
+]
 
 // const createRuleError = (fieldSchema, rule, fieldValueRaw, ruleValue, message) => {
 //   const { field, location } = fieldSchema
@@ -287,7 +336,7 @@ export default validateRequest
 //     expected: rule,
 //     value: fieldValueRaw,
 //     errorMessage: message
-    
+
 //   }
 // }
 
@@ -315,7 +364,6 @@ export default validateRequest
 //   value: '123',
 //   errorMessage: '_id must be a valid MongodDB ObjectID as string.'
 // }
-
 
 // const createTypeError = (fieldSchema, valueReceived) => {
 //   const { field, location, expectedType } = fieldSchema
