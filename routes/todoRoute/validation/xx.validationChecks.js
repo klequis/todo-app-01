@@ -1,7 +1,7 @@
 import { isValidDate, isValidAuth0UserId } from 'lib'
 import { isMongoId, isUUID } from 'validator'
 import { findOne } from 'db'
-import { TODO_COLLECTION_NAME } from 'routes/constants'
+import { TODO_COLLECTION_NAME } from 'db/constants'
 import { blue } from 'logger'
 
 export const completedCheck = {

@@ -1,20 +1,24 @@
 import { expect } from 'chai'
-import { fourTodos } from './fixture'
+import { fourTodos } from 'test/fourTodos'
 import { dropCollection, find, insertMany } from 'db'
 import getToken from 'test/getToken'
 import sendRequest from 'test/sendRequest'
-import { TODO_COLLECTION_NAME } from 'routes/constants'
+import { TODO_COLLECTION_NAME } from 'db/constants'
+import config from 'config'
 
-const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
+// const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
 const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
 const idNotFound = '5cfbe5bf4bc4b4f726a14852' // this is a valid id but not in the db
 
-const deleteUri = value => {
-  const uri = `/api/todo/${value}`
+const cfg = config()
+const auth0UUID = cfg.testUser.auth0UUID
+
+const deleteUri = todoid => {
+  const uri = `/api/todo/${auth0UUID}/${todoid}`
   return uri
 }
 
-describe('test DELETE /api/todo/:id', function() {
+describe('test DELETE /api/todo/:userid/:todoid', function() {
   let _idToDelete = ''
   let token = undefined
 
@@ -45,7 +49,7 @@ describe('test DELETE /api/todo/:id', function() {
     expect(body[0].completed).to.equal(false)
   })
 
-  it('should return invalid id', async function() {
+  it('should return invalid todoid', async function() {
     const r = await sendRequest({
       method: 'DELETE',
       uri: deleteUri(invalidMongoId),
@@ -53,7 +57,7 @@ describe('test DELETE /api/todo/:id', function() {
       token
     })
     const { errors } = r.body
-    expect(errors[0].msg).to.equal(invalidMongoIdMsg)
+    expect(errors[0].msg).to.equal('003: param todoid is not valid')
   })
 
   it('should return id not found', async function() {

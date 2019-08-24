@@ -1,6 +1,6 @@
 import wrap from 'routes/wrap'
 import { insertOne } from 'db'
-import { TODO_COLLECTION_NAME } from 'routes/constants'
+import { TODO_COLLECTION_NAME } from 'db/constants'
 import { green, logRequest } from 'logger'
 
 /**
@@ -10,8 +10,8 @@ import { green, logRequest } from 'logger'
  * @returns {object} [{ _id, title, completed }] an array of one todo
  */
 const todoPost = wrap(async (req, res) => {
-  green('**POST')
-  logRequest(req)
+  // green('**POST')
+  // logRequest(req)
 
   const { body, params } = req
 

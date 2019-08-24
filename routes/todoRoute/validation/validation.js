@@ -8,38 +8,27 @@ import {
 } from 'validator'
 import { toString } from 'lib'
 import createError from './createError'
+import { findOne } from 'db'
+import { TODO_COLLECTION_NAME } from 'db/constants'
+import { isEmpty as ramdaIsEmpty } from 'ramda'
+
 import { blue } from 'logger'
 
-const validation = (req, res, next) => {
+const userExists = async userId => {
+  const r = await findOne(TODO_COLLECTION_NAME, { userId: userId }, { _id: 1 })
+  return !ramdaIsEmpty(r)
+}
+
+const validation = async (req, res, next) => {
   const errors = []
+
   const method = req.method
-  blue('method', method)
+  // blue('method', method)
+
   const { body, params } = req
 
   const { userid, todoid } = params
 
-  // params ---
-  if (!isUUID(toString(userid), 4)) {
-    errors.push(
-      createError('params', '001: param userid is not valid', 'userid')
-    )
-  }
-
-  // no good way to differentiate GET from GET :todoid
-  // therefore somewhat lengthy if statement
-  if (
-    method === 'PATCH' ||
-    method === 'DELETE' ||
-    (method === 'GET' && !isEmpty(todoid))
-  ) {
-    if (!isMongoId(toString(todoid))) {
-      errors.push(
-        createError('params', '003: param todoid is not valid', 'todoid')
-      )
-    }
-  }
-
-  // body ---
   const {
     _id,
     completed,
@@ -49,6 +38,45 @@ const validation = (req, res, next) => {
     title,
     userId
   } = body
+
+  // params ---
+  if (!isUUID(toString(userid), 4)) {
+    errors.push(
+      createError('params', '001: param userid is not valid', 'userid')
+    )
+  }
+
+  // only PATCH has 
+  if (method === 'PATCH' || method === 'POST') {
+    // blue('userId', userId)
+    // blue('userid', userid)
+    if (userId !== userid) {
+      errors.push(createError('', '0012: unmatched user iDs', ''))
+    }
+  }
+  
+  // blue('userid', typeof userid)
+  const exists = await userExists(userid)
+  // blue('exists', exists)
+  if (!exists) {
+    errors.push(createError('params', '011: unknown user', 'userid'))
+  }
+
+  // no good way to differentiate GET from GET :todoid
+  // therefore somewhat lengthy if statement
+  if (
+    method === 'PATCH' ||
+    method === 'DELETE' ||
+    (method === 'GET' && !isEmpty(toString(todoid)))
+  ) {
+    if (!isMongoId(toString(todoid))) {
+      errors.push(
+        createError('params', '003: param todoid is not valid', 'todoid')
+      )
+    }
+  }
+
+  // body ---
 
   if (method === 'PATCH') {
     if (!isMongoId(toString(_id))) {
@@ -85,9 +113,9 @@ const validation = (req, res, next) => {
 
   if (method === 'POST' || method === 'PATCH') {
     // due date is not required
-    blue('isEmpty', isEmpty(toString(dueDate)))
+    // blue('isEmpty', isEmpty(toString(dueDate)))
     if (!isEmpty(toString(dueDate))) {
-      blue('** it is not empty')  
+      // blue('** it is not empty')
       if (!isISO8601(toString(dueDate)))
         errors.push(
           createError(

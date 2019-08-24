@@ -1,23 +1,29 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { fourTodos } from './fixture'
+import { fourTodos } from 'test/fourTodos'
 import {
   close,
   dropCollection,
   find,
   findById,
+  findOne,
   findOneAndDelete,
   findOneAndUpdate,
   insertMany,
   insertOne
 } from 'db'
-
+import config from 'config'
+import { isNil, isEmpty } from 'ramda'
 import { yellow } from 'logger'
 
 
 chai.use(chaiAsPromised)
 
 const collectionName = 'todos'
+
+
+const cfg = config()
+const auth0UUID = cfg.testUser.auth0UUID
 
 after(async () => {
   await close()
@@ -80,13 +86,14 @@ describe('dbFunctions success cases', function() {
     let idToFind = undefined
     before(async function() {
       await dropCollection(collectionName)
-      const ret = await insertMany(collectionName, fourTodos)
-      idToFind = ret[0]._id.toString()
+      const r = await insertMany(collectionName, fourTodos)
+      idToFind = r[0]._id.toString()
     })
     it('findById: should return 1 todo with id of second todo', async function() {
-      const ret = await findById('todos', idToFind)
-      expect(ret.length).to.equal(1)
-      const idFound = ret[0]._id.toString()
+      const r = await findById('todos', idToFind)
+      yellow('r', r)
+      expect(r.length).to.equal(1)
+      const idFound = r[0]._id.toString()
       expect(idFound).to.equal(idToFind)
     })
   })
@@ -112,14 +119,37 @@ describe('dbFunctions success cases', function() {
       await dropCollection(collectionName)
       const ret = await insertMany(collectionName, fourTodos)
       idToUpdate = ret[1]._id.toString()
-      yellow('idToUpdate', idToUpdate)
+      // yellow('idToUpdate', idToUpdate)
     })
     it('findOneAndUpdate: should return updated document', async function() {
       const ret = await findOneAndUpdate(collectionName, { _id: idToUpdate }, newData)
-      yellow('ret', ret)
       expect(ret[0]._id.toString()).to.equal(idToUpdate)
       expect(ret[0].title).to.equal(newData.title)
       expect(ret[0].completed).to.equal(newData.completed)
     })
   })
+
+  describe('test findOne', function() {
+    before(async function() {
+      await dropCollection(collectionName)
+      await insertMany(collectionName, fourTodos)
+    })
+    it('findOne valid userId: should return one document with _id', async function() {
+      const r = await findOne(
+        collectionName,
+        { userId: auth0UUID },
+        { _id: 1 }
+      )
+      const _idNil = isNil(r)
+      expect(_idNil).to.equal(false)
+    })
+    it('findOne invalid userId: empty object', async function() {
+      const r = await findOne(collectionName, { userId: 'auth0UUID' }, { _id: 1 })
+      // yellow('r', isNil(r))
+      const _idNil = isNil(r)
+      // const { _id } = r
+      expect(_idNil).to.equal(true)
+    })
+  })
 })
+

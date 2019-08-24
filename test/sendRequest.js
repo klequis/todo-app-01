@@ -26,7 +26,7 @@ const sendRequest = async ({
   token,
   contentType=/json/
  }) => {
-  // logSendRequest(method, uri, status, body, token, contentType)
+  logSendRequest(method, uri, status, body, token, contentType)
 
   const methodToLower = method.toLowerCase()
 

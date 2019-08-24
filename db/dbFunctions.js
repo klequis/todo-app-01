@@ -2,12 +2,31 @@ import mongodb, { ObjectID } from 'mongodb'
 import { removeIdProp } from 'lib'
 import config from '../config'
 import { hasProp } from 'lib'
-import { mergeRight } from 'ramda'
+import { mergeRight, isEmpty, isNil } from 'ramda'
 import { green } from 'logger'
 
 const MongoClient = mongodb.MongoClient
 
 let client
+
+const idStringToObjectID = obj => {
+  // green('obj', obj)
+  switch (typeof obj) {
+    case 'string':
+      // green('** converting string to ObjectId')
+      return ObjectID(obj)
+    case 'object':
+      if (isEmpty(obj)) return obj
+      if (!hasProp('_id', obj)) return obj
+      // green('** converting _id prop in obj to ObjectID')
+      const { _id: id } = obj
+      const _id = typeof id === 'string' ? ObjectID(id) : id
+      return mergeRight(obj, { _id })
+    default:
+      // TODO: should obj be returned?
+      return obj
+  }
+}
 
 const connectDB = async () => {
   try {
@@ -35,9 +54,11 @@ export const close = async () => {
  * @param {string} collection the name of a collection
  * @param {Array} data  an array of documents, without _id, to be inserted
  *
- * @returns {object} { data: [], error: '' } where data is an array of one or more documents
+ * @returns {object}
  */
 export const insertMany = async (collection, data) => {
+  // TODO: Allows insertion of _id. Should it? If yes they should be
+  // converted to ObjectID
   try {
     const { db } = await connectDB()
     const r = await db.collection(collection).insertMany(data)
@@ -70,7 +91,7 @@ export const dropCollection = async collection => {
  *
  * @param {string} collection the name of a collection
  * @param {object} data a documnet, without _id, to be inserted
- * @returns {object} { data: [], error: '' } where data is always an array of 1
+ * @returns {object}
  *
  */
 export const insertOne = async (collection, data) => {
@@ -88,23 +109,36 @@ export const insertOne = async (collection, data) => {
  * @param {string} collection the name of a collection
  * @param {object} filter filter criteria
  * @param {object} project a valid projection
- * @returns {array} { data: [], error: '' } where data is an array of one or more documents
+ * @returns {array}
  *
  */
-export const find = async (collection, filter = {}, project = {}) => {
-  // currently find returns _id as an Object. The client will always get a string.
-  // I see no reason to pass an ObjectID back here, it just increases complexity in
-  // testing and in the routes when validating.
-  // Going to try to always pass back the id as a string and see how it goes
-  // ** check other functions where ObjectID may be passed back
-  // actuall, maybe I don't care?
+export const find = async (collection, filter = {}, projection = {}) => {
+  const f = idStringToObjectID(filter)
   try {
     const { db } = await connectDB()
     return await db
       .collection(collection)
-      .find(filter)
-      .project(project)
+      .find(f)
+      .project(projection)
       .toArray()
+  } catch (e) {
+    throw new Error(e.message)
+  }
+}
+
+/**
+ *
+ * @param {string} collection the name of a collection
+ * @param {object} filter filter criteria
+ * @param {object} project a valid projection
+ * @returns {array}
+ *
+ */
+export const findOne = async (collection, filter = {}, projection = {}) => {
+  const f = idStringToObjectID(filter)
+  try {
+    const { db } = await connectDB()
+    return await db.collection(collection).findOne(f, { projection })
   } catch (e) {
     throw new Error(e.message)
   }
@@ -115,15 +149,17 @@ export const find = async (collection, filter = {}, project = {}) => {
  * @param {string} collection the name of a collection
  * @param {string} id a valid _id as string
  * @param {object} project a valid projection
- * @returns {object} { data: [], error: '' } where data is always an array of 1
+ * @returns {object}
  */
-export const findById = async (collection, id, project = {}) => {
+export const findById = async (collection, id, projection = {}) => {
   try {
+    const _id = idStringToObjectID(id)
     const { db } = await connectDB()
     return await db
       .collection(collection)
-      .find({ _id: ObjectID(id) })
-      .project(project)
+      // .find({ _id: ObjectID(id) })
+      .find({ _id })
+      .project(projection)
       .toArray()
   } catch (e) {
     throw new Error(e.message)
@@ -134,15 +170,14 @@ export const findById = async (collection, id, project = {}) => {
  *
  * @param {string} collection the name of a collection
  * @param {string} id a valid _id as string
- * @returns {object} { data: [], error: '' } where data is always an array of 1
+ * @returns {object}
  */
 export const findOneAndDelete = async (collection, id) => {
   try {
+    const _id = idStringToObjectID(id)
     const { db } = await connectDB()
-    
-    const r = await db
-      .collection(collection)
-      .findOneAndDelete({ _id: ObjectID(id) })
+
+    const r = await db.collection(collection).findOneAndDelete({ _id })
     const { n, value } = r.lastErrorObject
     if (n === 0 && typeof value === 'undefined') {
       // throw an error
@@ -160,37 +195,26 @@ export const findOneAndDelete = async (collection, id) => {
  * @param {string} id a valid _id as string
  * @param {object} update document properties to be updated such as { title: 'new title', completed: true }
  * @param {boolean} returnOriginal if true, returns the original document instead of the updated one
- * @returns {object} { data: [], error: '' } where data is always an array of 1
+ * @returns {object}
  *
  */
 export const findOneAndUpdate = async (
   collection,
-  filter={},
+  filter = {},
   update,
   returnOriginal = false
 ) => {
-  green('collection', collection)
-  green('filter', filter)  
-  green('update', update)
-
   try {
-    // if filter has a string _id it must be converted to ObjectID
-    let _id = undefined
-    if (hasProp('_id', filter)) {
-      const { _id: id } = filter
-      
-      _id = typeof id === 'string' ? ObjectID(id) : id
-    }
-    const newFilter = !(_id === undefined) ? mergeRight(filter, { _id }) : filter
+    const f = idStringToObjectID(filter)
 
     // if the update has the _id prop, remove it
-    const cleanedUpdate = removeIdProp(update)
+    const u = removeIdProp(update)
     const { db } = await connectDB()
     const r = await db
       .collection(collection)
       .findOneAndUpdate(
-        newFilter,
-        { $set: cleanedUpdate },
+        f,
+        { $set: u },
         { returnOriginal: returnOriginal }
       )
     return [r.value]

@@ -1,12 +1,14 @@
 import { expect } from 'chai'
-import { fourTodos, auth0UUID } from './fixture'
+import { auth0UUID } from './fixture'
+import { fourTodos } from 'test/fourTodos'
 import { dropCollection, insertMany } from 'db'
 import getToken from 'test/getToken'
 import sendRequest from 'test/sendRequest'
-import { TODO_COLLECTION_NAME } from 'routes/constants'
+import { TODO_COLLECTION_NAME } from 'db/constants'
 import { mergeRight } from 'ramda'
-import { yellow, redf } from 'logger'
 import { isDateTimeAfter, findObjectInArray } from 'lib'
+import { addDays, differenceInDays } from 'date-fns'
+import { redf } from 'logger'
 
 function patchUri(id) {
   return `/api/todo/${auth0UUID}/${id}`
@@ -28,57 +30,53 @@ describe('todoRoute PATCH', function() {
     })
     it('all fields valid - should return document with updated title, completed & lastUpdateAt', async function() {
       // use fourTodos[1]
-      const originalTodo = fourTodos[1]
-      const newData = mergeRight(originalTodo, {
+      const todo = fourTodos[1]
+      const originalDueDate = todo.dueDate
+      const originalDueDatePlus1Day = addDays(new Date(originalDueDate), 1).toISOString()
+      const todoSent = mergeRight(todo, {
         _id: idToUpdate1,
         title: 'changed title',
-        completed: true
+        completed: true,
+        dueDate: originalDueDatePlus1Day
       })
-      // yellow('newData', newData)
       const r = await sendRequest({
         method: 'PATCH',
-        uri: patchUri(newData._id),
+        uri: patchUri(todoSent._id),
         status: 200,
-        body: newData,
+        body: todoSent,
         token
       })
       const { body } = r
       // length
       expect(body.length).to.equal(1)
-      const modifiedTodo = body[0]
+      const todoReturned = body[0]
       // _id
-      expect(modifiedTodo._id).to.equal(idToUpdate1)
+      expect(todoReturned._id).to.equal(idToUpdate1)
       // completed
-      expect(modifiedTodo.completed).to.equal(newData.completed)
+      expect(todoReturned.completed).to.equal(todoSent.completed)
+      // createdAt
+      expect(todoReturned.createdAt).to.equal(todoSent.createdAt)
       // dueDate
-      expect(modifiedTodo.dueDate).to.equal(undefined)
+      const dayDiff = differenceInDays(todoReturned.dueDate, originalDueDate)
+      expect(dayDiff).to.equal(1)
       // lastUpdatedAt - won't match exact
       // just check that it is after
-      const origDate = fourTodos[1].lastUpdatedAt
-      const modDate = modifiedTodo.lastUpdatedAt
+      const origDate = todoSent.lastUpdatedAt
+      const modDate = todoReturned.lastUpdatedAt
       const after = isDateTimeAfter(origDate, modDate)
       expect(after).to.equal(true)
       // Title
-      expect(modifiedTodo.title).to.equal(newData.title)
+      expect(todoReturned.title).to.equal(todoSent.title)
       // userId
-      expect(modifiedTodo.userId).to.equal(newData.userId)
+      expect(todoReturned.userId).to.equal(todoSent.userId)
     })
 
-    
     it('invalid _id, invalid userId, all others missing', async function() {
-      // (3) invalid fields: _id, todoid, userId
-      // (3) missing fields: completed, createdAt, lastUpdatedAt
-      // (1) valid fields: userid
-      // (1) other: title
-      // (1) dueDate
-      // totoal fields: 9
-      // errors: 7
-
       const r = await sendRequest({
         method: 'PATCH',
         uri: patchUri(),
         status: 422,
-        body: { 
+        body: {
           _id: '123',
           userId: '123',
           title: 'This title is more than 30 characters long.'
@@ -88,13 +86,16 @@ describe('todoRoute PATCH', function() {
       const { body } = r
 
       const { errors } = body
-      yellow('errors', errors)
-      // // length
       expect(errors.length).to.equal(8)
       // check all expected errors are returned
-      const errorFields = ['_id', 'todoid', 'completed', 'createdAt', 'lastUpdatedAt']
+      const errorFields = [
+        '_id',
+        'todoid',
+        'completed',
+        'createdAt',
+        'lastUpdatedAt'
+      ]
       errorFields.forEach(field => {
-
         const o = findObjectInArray(errors, 'param', field)
         // Log out any fields that are missing
         if (typeof o === 'undefined') {

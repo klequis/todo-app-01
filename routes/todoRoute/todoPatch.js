@@ -1,5 +1,5 @@
 import wrap from 'routes/wrap'
-import { TODO_COLLECTION_NAME } from 'routes/constants'
+import { TODO_COLLECTION_NAME } from 'db/constants'
 import { findOneAndUpdate } from 'db'
 import { mergeRight, pick } from 'ramda'
 import { green, red } from 'logger'
@@ -30,7 +30,6 @@ const todoPatch = wrap(async (req, res) => {
   const t2 = mergeRight(t1, { lastUpdatedAt: new Date().toISOString() })
 
   const r = await findOneAndUpdate(TODO_COLLECTION_NAME, { _id, userId: userid }, t2)
-  green('r', r)
   res.send(r)
 })
 

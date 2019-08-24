@@ -1,18 +1,23 @@
 import { expect } from 'chai'
-import { fourTodos } from './fixture'
+import { fourTodos } from 'test/fourTodos.js'
+
 import {
   dropCollection,
   insertMany,
 } from 'db'
 import getToken from 'test/getToken'
 import sendRequest from 'test/sendRequest'
-import { TODO_COLLECTION_NAME } from 'routes/constants'
+import { TODO_COLLECTION_NAME } from 'db/constants'
+import config from 'config'
+import { yellow } from 'logger'
 
-const invalidMongoIdMsg = 'Parameter id must be a valid MongodDB hex string.'
 const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
 
-const getUri = (value) => `/api/todo/${value || ''}`
+const cfg = config()
+const auth0UUID = cfg.testUser.auth0UUID
+const getUri = (todoid) => `/api/todo/${auth0UUID}/${todoid || ''}`
 
+yellow('fourTodos', fourTodos)
 
 describe('todoRoute GET', function() {
 
@@ -53,6 +58,8 @@ describe('todoRoute GET', function() {
         status: 200,
         token,
       })
+      const { body } = r
+      yellow('body', body)
       expect(r.body[0]._id.toString()).to.equal(_idToGet)
     })
     it('should get todo with specified _id', async function() {
@@ -63,7 +70,7 @@ describe('todoRoute GET', function() {
         token,
       })
       const { errors } = r.body
-      expect(errors[0].msg).to.equal(invalidMongoIdMsg)
+      expect(errors[0].msg).to.equal('003: param todoid is not valid')
     })
   })
 

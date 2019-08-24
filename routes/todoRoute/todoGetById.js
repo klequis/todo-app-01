@@ -1,7 +1,7 @@
 import wrap from 'routes/wrap'
-import { TODO_COLLECTION_NAME } from 'routes/constants'
-import { findById } from 'db'
-
+import { TODO_COLLECTION_NAME } from 'db/constants'
+import { find } from 'db'
+import { green } from 'logger'
 
 /**
  * @param {string} _id a valid MongoDB object id
@@ -9,22 +9,12 @@ import { findById } from 'db'
  * @return {object} 1 todo
  */
 const todoGetById = wrap(async (req, res) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
-    }
-    const id = req.params.id
-    const td1 = await findById(TODO_COLLECTION_NAME, id)
-    res.send(td1)
-  })
+  const { params } = req
+  const  { userid: userId, todoId: _id } = params
+  green('params', params)
+  const id = params.id
+  const td1 = await find(TODO_COLLECTION_NAME, { userId, _id })
+  res.send(td1)
+})
 
 export default todoGetById
-
-export const getByIdValidationSchema = {
-  id: {
-    in: ['params'],
-    isMongoId: {
-      errorMessage: 'Parameter id must be a valid MongodDB hex string.'
-    }
-  }
-}

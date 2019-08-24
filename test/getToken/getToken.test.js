@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import getToken from 'test/getToken'
 import { dropCollection, insertMany } from 'db'
-import { fourTodos } from './fixture'
+import { fourTodos } from 'test/fourTodos'
 import sendRequest from 'test/sendRequest'
-import { TODO_COLLECTION_NAME } from 'routes/constants'
+import { TODO_COLLECTION_NAME } from 'db/constants'
 
 describe('test getToken()', function() {
   let token

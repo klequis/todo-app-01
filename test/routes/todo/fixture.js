@@ -72,7 +72,7 @@ export const todoMissingUserId = {
 // invalid userId
 export const todoInvalidUserId = {
   title: 'a good todo',
-  userId: 'auth0|5e1f0gh7i482030jk3lmf087' // mutated guid
+  userId: '5e1f0gh7i482030jk3lmf087' // mutated guid
 }
 
 // junk userId with '|'
