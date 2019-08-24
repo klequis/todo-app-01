@@ -1,7 +1,7 @@
 import wrap from 'routes/wrap'
 import { findOneAndDelete } from 'db'
 import { TODO_COLLECTION_NAME } from 'db/constants'
-import { logRequest } from 'logger'
+import { logRequest, green } from 'logger'
 
 /**
  * @param {string} userid
@@ -19,18 +19,11 @@ import { logRequest } from 'logger'
 const todoDelete = wrap(async (req, res) => {
   logRequest(req)
   const { params } = req
+  green('params', params)
   const { userid: userId, todoid: _id } = params
+  green('_id', _id)
   const td1 = await findOneAndDelete(TODO_COLLECTION_NAME, { _id, userId})
   res.send(td1)
 })
-
-export const deleteValidationSchema = {
-  id: {
-    in: ['params'],
-    isMongoId: {
-      errorMessage: 'Parameter id must be a valid MongodDB hex string.'
-    }
-  }
-}
 
 export default todoDelete

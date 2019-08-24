@@ -67,7 +67,7 @@ describe('todoRoute GET', function() {
         method: 'GET',
         uri: getUri(invalidMongoId),
         status: 422,
-        token,
+        token
       })
       const { errors } = r.body
       expect(errors[0].msg).to.equal('003: param todoid is not valid')

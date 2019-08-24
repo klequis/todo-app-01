@@ -80,7 +80,7 @@ const error = (err, req, res, next) => {
 
   let status
   const msg = err.message.toLowerCase()
-  console.log('err', err)
+  // console.log('err', err)
 
   if (msg === 'no authorization token was found') {
     status = 401

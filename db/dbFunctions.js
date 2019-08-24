@@ -172,20 +172,20 @@ export const findById = async (collection, id, projection = {}) => {
  * @param {string} id a valid _id as string
  * @returns {object}
  */
-export const findOneAndDelete = async (collection, id) => {
+export const findOneAndDelete = async (collection, filter) => {
   try {
-    const _id = idStringToObjectID(id)
+    const f = idStringToObjectID(filter)
     const { db } = await connectDB()
 
-    const r = await db.collection(collection).findOneAndDelete({ _id })
+    const r = await db.collection(collection).findOneAndDelete(f)
     const { n, value } = r.lastErrorObject
     if (n === 0 && typeof value === 'undefined') {
       // throw an error
-      throw new Error(`No document found for _id ${id}`)
+      throw new Error(`No document found for ${JSON.stringify(filter, null, 2)}`)
     }
     return [r.value]
   } catch (e) {
-    throw e
+    throw new Error(e.message)
   }
 }
 
