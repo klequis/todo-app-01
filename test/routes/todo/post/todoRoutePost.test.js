@@ -2,7 +2,6 @@ import { expect } from 'chai'
 import {
   aNewTodoWithDueDate,
   aNewTodoWithoutDueDate,
-  auth0UUID,
   todoInvalidUserIdInBody,
   todoMissingUserIdInBody,
   todoTitleTooShort
@@ -12,9 +11,13 @@ import getToken from 'test/getToken'
 import sendRequest from 'test/sendRequest'
 import { TODO_COLLECTION_NAME } from 'routes/constants'
 import { differenceInMilliseconds } from 'date-fns'
+import config from 'config'
+import { addDays } from 'date-fns'
 
 import { yellow } from 'logger'
 
+const cfg = config()
+const auth0UUID = cfg.testUser.auth0UUID
 
 const postUri = `/api/todo/${auth0UUID}`
 
@@ -45,7 +48,11 @@ describe.only('todoRoute POST', function() {
       await dropCollection(TODO_COLLECTION_NAME)
     })
     it('new todo with dueDate', async function() {
-      const todoSent = aNewTodoWithDueDate
+      const todoSent = {
+        dueDate: addDays(new Date(), 1).toISOString(),
+        title: 'post: new todo with due date',
+        userId: auth0UUID
+      }
       yellow('todoSent', todoSent)
       const r = await sendRequest({
         method: 'POST',
@@ -68,7 +75,10 @@ describe.only('todoRoute POST', function() {
       expect(todo.userId).to.equal(auth0UUID)
     })
     it('new todo without dueDate', async function() {
-      const todoSent = aNewTodoWithoutDueDate
+      const todoSent = {
+        title: 'post: new todo w/o dueDate',
+        userId: auth0UUID
+      }
       const r = await sendRequest({
         method: 'POST',
         uri: postUri,
@@ -77,7 +87,6 @@ describe.only('todoRoute POST', function() {
         token
       })
       const { body } = r
-      // yellow('body', body)
       expect(body.length).to.equal(1)
       const todo = body[0]
       expect(todo.completed).to.equal(false)
@@ -95,7 +104,9 @@ describe.only('todoRoute POST', function() {
         await dropCollection(TODO_COLLECTION_NAME)
       })
       it('missing userId in body', async function() {
-        const todoSent = todoMissingUserIdInBody
+        const todoSent = {
+          title: 'post: missing userId in body'
+        }
         const r = await sendRequest({
           method: 'POST',
           uri: postUri,
@@ -106,10 +117,13 @@ describe.only('todoRoute POST', function() {
         const { body } = r
         const { errors } = body
         expect(errors.length).to.equal(1)
-        expect(errors[0].msg).to.equal('Unknown user')
+        expect(errors[0].msg).to.equal('010: field userId is not valid')
       })
       it('invalid userId in body', async function() {
-        const todoSent = todoInvalidUserIdInBody
+        const todoSent = {
+          title: 'a good todo',
+          userId: 'aaaa-bbbb'
+        }
         const r = await sendRequest({
           method: 'POST',
           uri: postUri,
@@ -120,10 +134,13 @@ describe.only('todoRoute POST', function() {
         const { body } = r
         const { errors } = body
         expect(errors.length).to.equal(1)
-        expect(errors[0].msg).to.equal('Unknown user')
+        expect(errors[0].msg).to.equal('010: field userId is not valid')
       })
       it('title too short', async function() {
-        const todoSent = todoTitleTooShort
+        const todoSent = {
+          title: 'aa',
+          userId: auth0UUID
+        }
         const r = await sendRequest({
           method: 'POST',
           uri: postUri,
@@ -135,7 +152,7 @@ describe.only('todoRoute POST', function() {
         const { errors } = body
         expect(errors.length).to.equal(1)
         expect(errors[0].msg).to.equal(
-          'Title must be at least 3 characters long.'
+          '009: field title must be at least 3 character but not more than 30 characters.'
         )
       })
     })

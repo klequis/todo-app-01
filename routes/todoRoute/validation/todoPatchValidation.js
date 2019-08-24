@@ -34,19 +34,20 @@ const patchValidation = (req, res, next) => {
     userId
   } = body
 
-  if (!isMongoId(toString(_id)))
+  if (!isMongoId(toString(_id))) {
     errors.push(createError('body', 'userid is not valid.', '_id'))
+  }
 
-  if (!isBoolean(toString(completed)))
+  if (!isBoolean(toString(completed))) {
     errors.push(
       createError('body', 'completed must be true or false.', 'completed')
     )
-
-  if (!isISO8601(toString(createdAt)))
+  }
+  if (!isISO8601(toString(createdAt))) {
     errors.push(
       createError('body', 'createdAt must be an ISO date string.', 'createdAt')
     )
-
+  }
   // due date is not required
   if (!isEmpty(toString(dueDate))) {
     if (!isISO8601(toString(dueDate)))
@@ -55,7 +56,7 @@ const patchValidation = (req, res, next) => {
       )
   }
 
-  if (!isISO8601(toString(lastUpdatedAt)))
+  if (!isISO8601(toString(lastUpdatedAt))) {
     errors.push(
       createError(
         'body',
@@ -63,8 +64,8 @@ const patchValidation = (req, res, next) => {
         'lastUpdatedAt'
       )
     )
-
-  if (!isLength(toString(title), { min: 3, max: 30 }))
+  }
+  if (!isLength(toString(title), { min: 3, max: 30 })) {
     errors.push(
       createError(
         'body',
@@ -72,13 +73,14 @@ const patchValidation = (req, res, next) => {
         'title'
       )
     )
-
-  if (!isMongoId(toString(_id)))
+  }
+  if (!isMongoId(toString(_id))) {
     errors.push(createError('body', 'field _id is not valid.', '_id'))
+  }
 
-  if (!isUUID(toString(userId), 4))
+  if (!isUUID(toString(userId), 4)) {
     errors.push(createError('body', 'field userId is not valid', 'userId'))
-
+  }
   // should this go here or should I throw if it isn't correct
   // if (!(toString(userid) === toString(userid)))
   //   errors.push(createError('n/a', 'userid in params must match userId in body', 'userId'))
