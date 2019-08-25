@@ -17,7 +17,6 @@ const cfg = config()
 const auth0UUID = cfg.testUser.auth0UUID
 const getUri = (todoid) => `/api/todo/${auth0UUID}/${todoid || ''}`
 
-yellow('fourTodos', fourTodos)
 
 describe('todoRoute GET', function() {
 

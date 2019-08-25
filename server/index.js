@@ -48,8 +48,8 @@ app.get('/health', async (req, res) => {
   }
 })
 
-red('WARNING: token check is off!!')
-// app.use(checkJwt)
+// red('WARNING: token check is off!!')
+app.use(checkJwt)
 
 app.use((req, res, next) => {
   res.header('Content-Type', 'application/json')

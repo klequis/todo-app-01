@@ -16,11 +16,9 @@ import config from 'config'
 import { isNil, isEmpty } from 'ramda'
 import { yellow } from 'logger'
 
-
 chai.use(chaiAsPromised)
 
 const collectionName = 'todos'
-
 
 const cfg = config()
 const auth0UUID = cfg.testUser.auth0UUID
@@ -106,7 +104,7 @@ describe('dbFunctions success cases', function() {
       idToDelete = ret[1]._id.toString()
     })
     it('findOneAndDelete: should delete 1 of 4 todos', async function() {
-      const ret = await findOneAndDelete(collectionName, idToDelete)
+      const ret = await findOneAndDelete(collectionName, { _id: idToDelete })
       const idDeleted = ret[0]._id.toString()
       expect(idDeleted).to.equal(idToDelete)
     })
@@ -122,7 +120,11 @@ describe('dbFunctions success cases', function() {
       // yellow('idToUpdate', idToUpdate)
     })
     it('findOneAndUpdate: should return updated document', async function() {
-      const ret = await findOneAndUpdate(collectionName, { _id: idToUpdate }, newData)
+      const ret = await findOneAndUpdate(
+        collectionName,
+        { _id: idToUpdate },
+        newData
+      )
       expect(ret[0]._id.toString()).to.equal(idToUpdate)
       expect(ret[0].title).to.equal(newData.title)
       expect(ret[0].completed).to.equal(newData.completed)
@@ -135,16 +137,16 @@ describe('dbFunctions success cases', function() {
       await insertMany(collectionName, fourTodos)
     })
     it('findOne valid userId: should return one document with _id', async function() {
-      const r = await findOne(
-        collectionName,
-        { userId: auth0UUID },
-        { _id: 1 }
-      )
+      const r = await findOne(collectionName, { userId: auth0UUID }, { _id: 1 })
       const _idNil = isNil(r)
       expect(_idNil).to.equal(false)
     })
     it('findOne invalid userId: empty object', async function() {
-      const r = await findOne(collectionName, { userId: 'auth0UUID' }, { _id: 1 })
+      const r = await findOne(
+        collectionName,
+        { userId: 'auth0UUID' },
+        { _id: 1 }
+      )
       // yellow('r', isNil(r))
       const _idNil = isNil(r)
       // const { _id } = r
@@ -152,4 +154,3 @@ describe('dbFunctions success cases', function() {
     })
   })
 })
-

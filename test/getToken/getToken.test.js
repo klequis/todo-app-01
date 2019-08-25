@@ -4,6 +4,10 @@ import { dropCollection, insertMany } from 'db'
 import { fourTodos } from 'test/fourTodos'
 import sendRequest from 'test/sendRequest'
 import { TODO_COLLECTION_NAME } from 'db/constants'
+import config from 'config'
+
+const cfg = config()
+const auth0UUID = cfg.testUser.auth0UUID
 
 describe('test getToken()', function() {
   let token
@@ -26,7 +30,7 @@ describe('test getToken()', function() {
   it('should return 4 todos', async function() {
     const r = await sendRequest({
       method: 'GET',
-      uri: '/api/todo',
+      uri: `/api/todo/${auth0UUID}`,
       status: 200,
       token
     })

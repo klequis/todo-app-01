@@ -18,7 +18,7 @@ const deleteUri = todoid => {
   return uri
 }
 
-describe.only('test DELETE /api/todo/:userid/:todoid', function() {
+describe('test DELETE /api/todo/:userid/:todoid', function() {
   let _idToDelete = ''
   let token = undefined
 
@@ -60,7 +60,7 @@ describe.only('test DELETE /api/todo/:userid/:todoid', function() {
     expect(errors[0].msg).to.equal('003: param todoid is not valid')
   })
 
-  it.only('should return id not found', async function() {
+  it('should return id not found', async function() {
     const r = await sendRequest({
       method: 'DELETE',
       uri: deleteUri(idNotFound),
