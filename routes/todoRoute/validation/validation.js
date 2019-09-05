@@ -15,6 +15,7 @@ import { isEmpty as ramdaIsEmpty } from 'ramda'
 import { blue } from 'logger'
 
 const userExists = async userId => {
+  blue('userExists: userId', userId)
   const r = await findOne(TODO_COLLECTION_NAME, { userId: userId }, { _id: 1 })
   return !ramdaIsEmpty(r)
 }
@@ -26,8 +27,10 @@ const validation = async (req, res, next) => {
   // blue('method', method)
 
   const { body, params } = req
+  blue('body', body)
 
   const { userid, todoid } = params
+  blue('params', params)
 
   const {
     _id,
@@ -135,6 +138,7 @@ const validation = async (req, res, next) => {
       )
     }
     if (!isUUID(toString(userId), 4)) {
+      blue('userId', userId)      
       errors.push(
         createError('body', '010: field userId is not valid', 'userId')
       )
