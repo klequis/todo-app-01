@@ -10,16 +10,11 @@ import { green, logRequest } from 'logger'
  * @returns {object} [{ _id, title, completed }] an array of one todo
  */
 const todoPost = wrap(async (req, res) => {
-  // green('**POST')
-  // logRequest(req)
 
   const { body, params } = req
-
   const { dueDate, title } = body
 
-  // green('POST params', params)
   const { userid } = params
-  // green('POST userid', userid)
 
   const td1 = {
     completed: false,
@@ -31,7 +26,7 @@ const todoPost = wrap(async (req, res) => {
   }
 
   const inserted = await insertOne(TODO_COLLECTION_NAME, td1)
-  // green('POST inserted', inserted)
+  green('POST inserted', inserted)
   res.send(inserted)
 })
 
