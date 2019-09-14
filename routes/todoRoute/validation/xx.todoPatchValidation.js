@@ -6,8 +6,10 @@ import {
   isMongoId,
   isUUID
 } from 'validator'
+// import { has } from 'ramda'
 import { toString } from 'lib'
 import createError from './createError'
+import { yellow } from 'logger'
 
 const patchValidation = (req, res, next) => {
   const errors = []
@@ -24,31 +26,35 @@ const patchValidation = (req, res, next) => {
 
   // body
   const { body } = req
+      yellow('body', body)
   const {
-    _id,
-    completed,
-    createdAt,
-    dueDate,
-    lastUpdatedAt,
-    title,
-    userId
+    _id, // reqired
+    title, // required
+    userId, // required
+
+    completed, // optional
+    dueDate, // optional
+
+    // createdAt, // n/a
+    // lastUpdatedAt // n/a
   } = body
 
-  if (!isMongoId(toString(_id))) {
-    errors.push(createError('body', 'userid is not valid.', '_id'))
+  if (!isUUID(toString(userId), 4)) {
+    errors.push(createError('body', 'field userId is not valid', 'userId'))
   }
 
-  if (!isBoolean(toString(completed))) {
-    errors.push(
-      createError('body', 'completed must be true or false.', 'completed')
-    )
+  if (!isMongoId(toString(_id))) {
+    errors.push(createError('body', 'field _id is not valid.', '_id'))
   }
-  if (!isISO8601(toString(createdAt))) {
-    errors.push(
-      createError('body', 'createdAt must be an ISO date string.', 'createdAt')
-    )
+
+  if (!isEmpty(completed)) {
+    if (!isBoolean(toString(completed))) {
+      errors.push(
+        createError('body', 'completed must be true or false.', 'completed')
+      )
+    }
   }
-  // due date is not required
+
   if (!isEmpty(toString(dueDate))) {
     if (!isISO8601(toString(dueDate)))
       errors.push(
@@ -56,16 +62,14 @@ const patchValidation = (req, res, next) => {
       )
   }
 
-  if (!isISO8601(toString(lastUpdatedAt))) {
-    errors.push(
-      createError(
-        'body',
-        'lastUpdatedAt must be an ISO date string.',
-        'lastUpdatedAt'
-      )
-    )
-  }
-  if (!isLength(toString(title), { min: 3, max: 30 })) {
+  
+
+  if (
+    !isLength(toString(title), {
+      min: 3,
+      max: 30
+    })
+  ) {
     errors.push(
       createError(
         'body',
@@ -74,14 +78,7 @@ const patchValidation = (req, res, next) => {
       )
     )
   }
-  if (!isMongoId(toString(_id))) {
-    errors.push(createError('body', 'field _id is not valid.', '_id'))
-  }
-
-  if (!isUUID(toString(userId), 4)) {
-    errors.push(createError('body', 'field userId is not valid', 'userId'))
-  }
-  // should this go here or should I throw if it isn't correct
+  // TODO: enable this check here
   // if (!(toString(userid) === toString(userid)))
   //   errors.push(createError('n/a', 'userid in params must match userId in body', 'userId'))
 
@@ -95,3 +92,21 @@ const patchValidation = (req, res, next) => {
 }
 
 export default patchValidation
+
+
+// if (!isISO8601(toString(createdAt))) {
+  //   errors.push(
+  //     createError('body', 'createdAt must be an ISO date string.', 'createdAt')
+  //   )
+  // }
+
+  // due date is not required
+  // if (!isISO8601(toString(lastUpdatedAt))) {
+  //   errors.push(
+  //     createError(
+  //       'body',
+  //       'lastUpdatedAt must be an ISO date string.',
+  //       'lastUpdatedAt'
+  //     )
+  //   )
+  // }
