@@ -43,9 +43,9 @@ const checkTitleLength = (title, optional = false) => {
   const str = toString(title)
   if (optional && isEmpty(str)) return true
   return isLength(str, {
-        min: 3,
-        max: 30
-      })
+    min: 3,
+    max: 30
+  })
 }
 
 const validation = async (req, res, next) => {
@@ -86,92 +86,117 @@ const validation = async (req, res, next) => {
   }
 
   // PATCH
-  // required: isMongoId(params.todoid)
-  if (!checkIfMongoId(todoid)) {
-    errors.push(
-      createError('params', '003: param todoid is not valid', 'todoid')
-    )
+  if (method === 'PATCH') {
+    // required: isMongoId(params.todoid)
+    if (!checkIfMongoId(todoid)) {
+      errors.push(
+        createError('params', '003: param todoid is not valid', 'todoid')
+      )
+    }
+    // required: isUUID(body.userId)
+    if (!checkIfUUID) {
+      errors.push(
+        createError('body', '010: field userId is not valid', 'userId')
+      )
+    }
+    // required: params.userid===body.userId
+    if (!checkIdsAreEqual(userid, userId)) {
+      errors.push(createError('', '0012: unmatched user iDs', ''))
+    }
+    // required: isMongoID(body._id)
+    if (!checkIfMongoId(_id)) {
+      errors.push(createError('body', '006: field _id is not valid.', '_id'))
+    }
+    // optional: isBoolean(body.completed)
+    if (!checkCompletedIsBoolean(completed, true)) {
+      errors.push(
+        createError(
+          'body',
+          '004: completed must be true or false.',
+          'completed'
+        )
+      )
+    }
+    // optional: isDate(body.dueDate)
+    if (!checkDueDateIsDate(dueDate, true)) {
+      errors.push(
+        createError(
+          'body',
+          '008: dueDate must be an ISO date string.',
+          'dueDate'
+        )
+      )
+    }
+    // optional: body.title.length >=3 && <=30
+    if (!checkTitleLength(title, true)) {
+      createError(
+        'body',
+        '009: field title must be at least 3 character but not more than 30 characters.',
+        'title'
+      )
+    }
   }
-  // required: isUUID(body.userId)
-  if (!checkIfUUID) {
-    errors.push(createError('body', '010: field userId is not valid', 'userId'))
-  }
-  // required: params.userid===body.userId
-  if (!checkIdsAreEqual(userid, userId)) {
-    errors.push(createError('', '0012: unmatched user iDs', ''))
-  }
-  // required: isMongoID(body._id)
-  if (!checkIfMongoId(_id)) {
-    errors.push(createError('body', '006: field _id is not valid.', '_id'))
-  }
-  // optional: isBoolean(body.completed)
-  if (!checkCompletedIsBoolean(completed, true)) {
-    errors.push(
-      createError('body', '004: completed must be true or false.', 'completed')
-    )
-  }
-  // optional: isDate(body.dueDate)
-  if (!checkDueDateIsDate(dueDate, true)) {
-    errors.push(
-      createError('body', '008: dueDate must be an ISO date string.', 'dueDate')
-    )
-  }
-  // optional: body.title.length >=3 && <=30
-  if (!checkTitleLength(title, true)) {
-    createError(
-      'body',
-      '009: field title must be at least 3 character but not more than 30 characters.',
-      'title'
-    )
-  }
-
   // POST
-  // required: isUUID(body.userId)
-  if (!checkIfUUID) {
-    errors.push(createError('body', '010: field userId is not valid', 'userId'))
-  }
-  // required: params.userid===body.userId
-  if (!checkIdsAreEqual(userid, userId)) {
-    errors.push(createError('', '0012: unmatched user iDs', ''))
-  }
-  // optional: isBoolean(body.completed)
-  if (!checkCompletedIsBoolean(completed, true)) {
-    errors.push(
-      createError('body', '004: completed must be true or false.', 'completed')
-    )
-  }
-  // optional: isDate(body.dueDate)
-  // optional: isDate(body.dueDate)
-  if (!checkDueDateIsDate(dueDate, true)) {
-    errors.push(
-      createError('body', '008: dueDate must be an ISO date string.', 'dueDate')
-    )
-  }
-  // required: body.title.length >=3 && <=30
-  if (!checkTitleLength(title, false)) {
-    createError(
-      'body',
-      '009: field title must be at least 3 character but not more than 30 characters.',
-      'title'
-    )
+  if (method === 'POST') {
+    // required: isUUID(body.userId)
+    if (!checkIfUUID) {
+      errors.push(
+        createError('body', '010: field userId is not valid', 'userId')
+      )
+    }
+    // required: params.userid===body.userId
+    if (!checkIdsAreEqual(userid, userId)) {
+      errors.push(createError('', '0012: unmatched user iDs', ''))
+    }
+    // optional: isBoolean(body.completed)
+    if (!checkCompletedIsBoolean(completed, true)) {
+      errors.push(
+        createError(
+          'body',
+          '004: completed must be true or false.',
+          'completed'
+        )
+      )
+    }
+    // optional: isDate(body.dueDate)
+    // optional: isDate(body.dueDate)
+    if (!checkDueDateIsDate(dueDate, true)) {
+      errors.push(
+        createError(
+          'body',
+          '008: dueDate must be an ISO date string.',
+          'dueDate'
+        )
+      )
+    }
+    // required: body.title.length >=3 && <=30
+    if (!checkTitleLength(title, false)) {
+      createError(
+        'body',
+        '009: field title must be at least 3 character but not more than 30 characters.',
+        'title'
+      )
+    }
   }
   // DELETE
-  // required: isMongoID(params.todoid)
-  if (!checkIfMongoId(todoid)) {
-    errors.push(
-      createError('params', '003: param todoid is not valid', 'todoid')
-    )
+  if (method === 'DELETE') {
+    // required: isMongoID(params.todoid)
+    if (!checkIfMongoId(todoid)) {
+      errors.push(
+        createError('params', '003: param todoid is not valid', 'todoid')
+      )
+    }
   }
 
   // GetByID
-  // required: isMongoID(params.todoid)
-  if (!checkIfMongoId(todoid)) {
-    errors.push(
-      createError('params', '003: param todoid is not valid', 'todoid')
-    )
+  if (method === 'GET' && !isEmpty(toString(todoid))) {
+    if (!checkIfMongoId(todoid)) {
+      // required: isMongoID(params.todoid)
+      errors.push(
+        createError('params', '003: param todoid is not valid', 'todoid')
+      )
+    }
   }
-
-
   if (errors.length > 0) {
     blue('errors', errors)
     res.status(422).json({

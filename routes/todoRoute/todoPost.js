@@ -2,6 +2,7 @@ import wrap from 'routes/wrap'
 import { insertOne } from 'db'
 import { TODO_COLLECTION_NAME } from 'db/constants'
 import { green, logRequest } from 'logger'
+import { escape } from 'validator'
 
 /**
  * @param {string} title the title of the todo
@@ -21,13 +22,15 @@ const todoPost = wrap(async (req, res) => {
     createdAt: new Date(),
     dueDate: dueDate || null,
     lastUpdatedAt: new Date(),
-    title: title,
+    title: escape(title),
     userId: userid
   }
-
+  // const json = JSON.stringify(td1)
+  // green('escape', escape(json))
   const inserted = await insertOne(TODO_COLLECTION_NAME, td1)
-  green('POST inserted', inserted)
+  // green('POST inserted', escape(inserted.toString()))
   res.send(inserted)
 })
 
 export default todoPost
+
