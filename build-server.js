@@ -25,7 +25,7 @@ fs.copyFileSync('ecosystem.config.js', `${__dirname}/../ecosystem.config.js`)
 
 // remove ../app if it already exists
 if (fs.existsSync(appPath)) {
-  rimraf.sync(appPath, {}, function () { console.log("done"); });
+  rimraf.sync(appPath, {}, function () { console.log('done') })
 }
 
 // npm i for repo
