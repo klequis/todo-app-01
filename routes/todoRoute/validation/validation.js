@@ -60,9 +60,9 @@ const validation = async (req, res, next) => {
       errors.push(createError('', '0012: unmatched user iDs', ''))
     }
   }
-  
+
   const exists = await userExists(userid)
-  blue('exists', exists)  
+  blue('exists', exists)
   if (!exists) {
     errors.push(createError('params', '011: unknown user', 'userid'))
   }
@@ -138,7 +138,7 @@ const validation = async (req, res, next) => {
       )
     }
     if (!isUUID(toString(userId), 4)) {
-      blue('userId', userId)      
+      blue('userId', userId)
       errors.push(
         createError('body', '010: field userId is not valid', 'userId')
       )

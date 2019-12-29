@@ -9,14 +9,8 @@ import { find } from 'db'
  * @return {object} 1 todo
  */
 const todoGetById = wrap(async (req, res) => {
-
   const { params } = req
-  // green('params', params)
-
-  const  { userid: userId, todoid: _id } = params
-  // green('userId', userId)
-  // green('_id', _id)
-  
+  const { userid: userId, todoid: _id } = params
   const td1 = await find(TODO_COLLECTION_NAME, { userId, _id })
   res.send(td1)
 })

@@ -10,7 +10,6 @@ import { green, logRequest } from 'logger'
  * @returns {object} [{ _id, title, completed }] an array of one todo
  */
 const todoPost = wrap(async (req, res) => {
-
   const { body, params } = req
   const { dueDate, title } = body
 

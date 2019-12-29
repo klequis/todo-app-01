@@ -1,24 +1,23 @@
 export const fourTodos = [
   {
     title: 'first todo',
-    completed: false,
+    completed: false
   },
   {
     title: 'second todo',
-    completed: false,
+    completed: false
   },
   {
     title: 'third todo',
-    completed: false,
+    completed: false
   },
   {
     title: 'fourth todo',
-    completed: false,
-  },
+    completed: false
+  }
 ]
 
-export const oneTodo =
-{
+export const oneTodo = {
   title: 'one single todo',
-  completed: false,
+  completed: false
 }

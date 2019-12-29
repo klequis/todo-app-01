@@ -5,10 +5,7 @@ import mongodb, { ObjectID } from 'mongodb'
 import chalk from 'chalk'
 
 const mongoUrl = 'mongodb://localhost:27017/todo-test'
-const userName = 'todoTestUser'
 let dbName = ''
-const password = 'password@1'
-const roleName = 'testUserRole'
 
 const MongoClient = mongodb.MongoClient
 
@@ -150,9 +147,6 @@ const dropAllUsers = async userName => {
   })
   console.log('******************************')
   
-  // await execCmd({
-  //   dropUser: userName
-  // })
 }
 
 const dropAllUserDefinedRoles = async () => {
@@ -202,21 +196,8 @@ const main = async () => {
     logFailure('parameter dbName is required')
     return
   }
-
-  // await dropAllUserDefinedRoles()
-  //  await createRole('todoTest', 'todo-test')
-
-  // await listUserDefinedRoles()
-  // await listAllRoles()
-  // await createTestUser('todoTestUser', 'todo-test')
-  // await dropUser('robo3t')
-
-  
   await dropAllUsers()
   await listUsers()
-  // await printDbName()
-  // await listDatabases()
-  // await listCollections()
 }
 
 main()

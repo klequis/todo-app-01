@@ -64,7 +64,7 @@ app.get('*', function(req, res) {
 
 // 'debug' is not working when NODE_ENV=testLocal
 // Having both redf & lServerError is a work around
-const logError = (err, verbose=false) => {
+const logError = (err, verbose = false) => {
   if (process.env.NODE_ENV !== 'production') {
     console.log()
     if (verbose) {
@@ -83,7 +83,6 @@ const error = (err, req, res, next) => {
 
   let status
   const msg = err.message.toLowerCase()
-  // console.log('err', err)
 
   if (msg === 'no authorization token was found') {
     status = 401

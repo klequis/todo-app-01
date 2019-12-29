@@ -21,18 +21,19 @@ describe('todoRoute PATCH', function() {
   })
   describe('test PATCH /api/todo/:id', function() {
     let idToUpdate1
-    // let idToUpdate2
     before(async function() {
       await dropCollection(TODO_COLLECTION_NAME)
       const inserted = await insertMany(TODO_COLLECTION_NAME, fourTodos)
       idToUpdate1 = inserted[1]._id.toString()
-      // idToUpdate2 = inserted[2]._id.toString()
     })
     it('all fields valid - should return document with updated title, completed & lastUpdateAt', async function() {
       // use fourTodos[1]
       const todo = fourTodos[1]
       const originalDueDate = todo.dueDate
-      const originalDueDatePlus1Day = addDays(new Date(originalDueDate), 1).toISOString()
+      const originalDueDatePlus1Day = addDays(
+        new Date(originalDueDate),
+        1
+      ).toISOString()
       const todoSent = mergeRight(todo, {
         _id: idToUpdate1,
         title: 'changed title',

@@ -31,7 +31,6 @@ const sendRequest = async ({
   const methodToLower = method.toLowerCase()
 
   const validMethod = ['post', 'delete', 'get', 'patch'].includes(methodToLower)
-  // green('valid method', validMethod)
   if (!validMethod) {
     throw new Error(invalidMethodErrMsg(method))
   }

@@ -1,8 +1,5 @@
-import { expect } from 'chai'
 import sendRequest from 'test/sendRequest'
-import {
-  close,
-} from 'db'
+import { close } from 'db'
 import getToken from 'test/getToken'
 
 after(async () => {
@@ -20,7 +17,7 @@ describe('todoRoute', function() {
         method: 'GET',
         uri: '/api/unknown',
         status: 400,
-        token,
+        token
       })
     })
   })

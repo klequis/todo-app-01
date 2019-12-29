@@ -3,6 +3,7 @@ import { removeIdProp } from 'lib'
 import config from '../config'
 import { hasProp } from 'lib'
 import { mergeRight, isEmpty, isNil } from 'ramda'
+// eslint-disable-next-line
 import { green } from 'logger'
 
 const MongoClient = mongodb.MongoClient
@@ -10,15 +11,12 @@ const MongoClient = mongodb.MongoClient
 let client
 
 const idStringToObjectID = obj => {
-  // green('obj', obj)
   switch (typeof obj) {
     case 'string':
-      // green('** converting string to ObjectId')
       return ObjectID(obj)
     case 'object':
       if (isEmpty(obj)) return obj
       if (!hasProp('_id', obj)) return obj
-      // green('** converting _id prop in obj to ObjectID')
       const { _id: id } = obj
       const _id = typeof id === 'string' ? ObjectID(id) : id
       return mergeRight(obj, { _id })
@@ -157,7 +155,6 @@ export const findById = async (collection, id, projection = {}) => {
     const { db } = await connectDB()
     return await db
       .collection(collection)
-      // .find({ _id: ObjectID(id) })
       .find({ _id })
       .project(projection)
       .toArray()
@@ -181,7 +178,9 @@ export const findOneAndDelete = async (collection, filter) => {
     const { n, value } = r.lastErrorObject
     if (n === 0 && typeof value === 'undefined') {
       // throw an error
-      throw new Error(`No document found for ${JSON.stringify(filter, null, 2)}`)
+      throw new Error(
+        `No document found for ${JSON.stringify(filter, null, 2)}`
+      )
     }
     return [r.value]
   } catch (e) {
@@ -212,11 +211,7 @@ export const findOneAndUpdate = async (
     const { db } = await connectDB()
     const r = await db
       .collection(collection)
-      .findOneAndUpdate(
-        f,
-        { $set: u },
-        { returnOriginal: returnOriginal }
-      )
+      .findOneAndUpdate(f, { $set: u }, { returnOriginal: returnOriginal })
     return [r.value]
   } catch (e) {
     throw new Error(e.message)

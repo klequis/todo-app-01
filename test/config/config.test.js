@@ -17,7 +17,6 @@ describe('test config', function() {
     })
 
     describe(`test config for ${env}`, function() {
-
       // apiRoot
       it('should return apiRoot', function() {
         if (env in [TEST_LOCAL, DEV, TEST_LOCAL]) {

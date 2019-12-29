@@ -1,15 +1,11 @@
 import { expect } from 'chai'
 import { fourTodos } from 'test/fourTodos.js'
 
-import {
-  dropCollection,
-  insertMany,
-} from 'db'
+import { dropCollection, insertMany } from 'db'
 import getToken from 'test/getToken'
 import sendRequest from 'test/sendRequest'
 import { TODO_COLLECTION_NAME } from 'db/constants'
 import config from 'config'
-import { yellow } from 'logger'
 
 const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
 
@@ -17,10 +13,9 @@ const cfg = config()
 
 const testUserUUID = cfg.testUser.uuid
 
-const getUri = (todoid) => `/api/todo/${testUserUUID}/${todoid || ''}`
+const getUri = todoid => `/api/todo/${testUserUUID}/${todoid || ''}`
 
 describe('todoRoute GET', function() {
-
   let token = undefined
 
   before(async function() {
@@ -37,8 +32,7 @@ describe('todoRoute GET', function() {
         method: 'GET',
         uri: getUri(),
         status: 200,
-        token,
-
+        token
       })
       expect(r.body.length).to.equal(4)
     })
@@ -50,19 +44,16 @@ describe('todoRoute GET', function() {
       await dropCollection(TODO_COLLECTION_NAME)
       const r = await insertMany(TODO_COLLECTION_NAME, fourTodos)
       _idToGet = r[1]._id.toString()
-      yellow('_idToGet', _idToGet)
     })
     it('should get todo with specified _id', async function() {
       const t = getUri(_idToGet)
-      yellow('t', t)
       const r = await sendRequest({
         method: 'GET',
         uri: getUri(_idToGet),
         status: 200,
-        token,
+        token
       })
       const { body } = r
-      yellow('body', body)
       expect(r.body[0]._id.toString()).to.equal(_idToGet)
     })
     it('should get todo with specified _id', async function() {
@@ -76,5 +67,4 @@ describe('todoRoute GET', function() {
       expect(errors[0].msg).to.equal('003: param todoid is not valid')
     })
   })
-
 })

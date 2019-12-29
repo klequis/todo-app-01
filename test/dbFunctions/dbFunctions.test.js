@@ -117,7 +117,6 @@ describe('dbFunctions success cases', function() {
       await dropCollection(collectionName)
       const ret = await insertMany(collectionName, fourTodos)
       idToUpdate = ret[1]._id.toString()
-      // yellow('idToUpdate', idToUpdate)
     })
     it('findOneAndUpdate: should return updated document', async function() {
       const ret = await findOneAndUpdate(
@@ -137,19 +136,17 @@ describe('dbFunctions success cases', function() {
       await insertMany(collectionName, fourTodos)
     })
     it('findOne valid userId: should return one document with _id', async function() {
-      const r = await findOne(collectionName, { userId: testUserUUID }, { _id: 1 })
+      const r = await findOne(
+        collectionName,
+        { userId: testUserUUID },
+        { _id: 1 }
+      )
       const _idNil = isNil(r)
       expect(_idNil).to.equal(false)
     })
     it('findOne invalid userId: empty object', async function() {
-      const r = await findOne(
-        collectionName,
-        { userId: 'invalId' },
-        { _id: 1 }
-      )
-      // yellow('r', isNil(r))
+      const r = await findOne(collectionName, { userId: 'invalId' }, { _id: 1 })
       const _idNil = isNil(r)
-      // const { _id } = r
       expect(_idNil).to.equal(true)
     })
   })

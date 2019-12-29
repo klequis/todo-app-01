@@ -4,7 +4,6 @@ import { findOneAndUpdate } from 'db'
 import { mergeRight, pick } from 'ramda'
 import { green, red } from 'logger'
 
-
 /**
  * @param {object} todo a complete todo { _id, title, completed }
  *
@@ -18,19 +17,17 @@ const todoPatch = wrap(async (req, res) => {
   const { userid } = params
   const { _id } = body
 
-  const t1 = pick([
-    'completed',
-    'dueDate',
-    'lastUpdatedAt',
-    'title',
-  ], body)
+  const t1 = pick(['completed', 'dueDate', 'lastUpdatedAt', 'title'], body)
   const t2 = mergeRight(t1, { lastUpdatedAt: new Date().toISOString() })
 
-  const r = await findOneAndUpdate(TODO_COLLECTION_NAME, { _id, userId: userid }, t2)
+  const r = await findOneAndUpdate(
+    TODO_COLLECTION_NAME,
+    { _id, userId: userid },
+    t2
+  )
   green('r', r)
-  
+
   res.send(r)
 })
 
 export default todoPatch
-

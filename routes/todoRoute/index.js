@@ -5,8 +5,6 @@ import todoDelete from './todoDelete'
 import todoPatch from './todoPatch'
 import todoPost from './todoPost'
 
-// import todoPatchValidation from './validation/todoPatchValidation'
-// import todoPostValidation from './validation/todoPostValidation'
 import validation from './validation/validation'
 
 const router = express.Router()

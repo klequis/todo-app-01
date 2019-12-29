@@ -7,18 +7,13 @@ const getToken = () => {
   const clientId = cfg.auth0.clientId
   const clientSecret = cfg.auth0.clientSecret
   const appIdentifier = cfg.auth0.apiIdentifier
-  
-  return new Promise((resolve, reject) => {
 
+  return new Promise((resolve, reject) => {
     const options = {
       method: 'POST',
       url: tokenEndpoint,
       headers: { 'content-type': 'application/json' },
-      body: `{"client_id":"${clientId}","client_secret":"${
-        clientSecret
-      }","audience":"${
-        appIdentifier
-      }","grant_type":"client_credentials"}`
+      body: `{"client_id":"${clientId}","client_secret":"${clientSecret}","audience":"${appIdentifier}","grant_type":"client_credentials"}`
     }
 
     request(options, function(error, response, body) {
@@ -31,7 +26,6 @@ const getToken = () => {
       }
     })
   })
-
 }
 
 export default getToken
