@@ -20,6 +20,7 @@ const cfg = config()
 const jwt = require('express-jwt')
 const jwksRsa = require('jwks-rsa')
 
+// If not used, see below, token check is off
 const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
@@ -49,7 +50,7 @@ app.get('/health', async (req, res) => {
 })
 
 // red('WARNING: token check is off!!')
-// app.use(checkJwt)
+app.use(checkJwt)
 
 app.use((req, res, next) => {
   res.header('Content-Type', 'application/json')
@@ -61,6 +62,8 @@ app.get('*', function(req, res) {
   throw new Error(`unknown route: ..${req.url}`)
 })
 
+// 'debug' is not working when NODE_ENV=testLocal
+// Having both redf & lServerError is a work around
 const logError = (err, verbose=false) => {
   if (process.env.NODE_ENV !== 'production') {
     console.log()

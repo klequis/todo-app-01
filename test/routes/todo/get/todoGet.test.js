@@ -14,9 +14,10 @@ import { yellow } from 'logger'
 const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
 
 const cfg = config()
-const auth0UUID = cfg.testUser.auth0UUID
-const getUri = (todoid) => `/api/todo/${auth0UUID}/${todoid || ''}`
 
+const testUserUUID = cfg.testUser.uuid
+
+const getUri = (todoid) => `/api/todo/${testUserUUID}/${todoid || ''}`
 
 describe('todoRoute GET', function() {
 
@@ -49,8 +50,11 @@ describe('todoRoute GET', function() {
       await dropCollection(TODO_COLLECTION_NAME)
       const r = await insertMany(TODO_COLLECTION_NAME, fourTodos)
       _idToGet = r[1]._id.toString()
+      yellow('_idToGet', _idToGet)
     })
     it('should get todo with specified _id', async function() {
+      const t = getUri(_idToGet)
+      yellow('t', t)
       const r = await sendRequest({
         method: 'GET',
         uri: getUri(_idToGet),

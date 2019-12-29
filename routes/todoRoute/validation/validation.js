@@ -1,3 +1,10 @@
+/*
+    Used by:
+    - routes/todoRoute/index.js
+    - server/index.js
+
+*/
+
 import {
   isBoolean,
   isEmpty,
@@ -15,8 +22,8 @@ import { isEmpty as ramdaIsEmpty } from 'ramda'
 import { blue } from 'logger'
 
 const userExists = async userId => {
-  blue('userExists: userId', userId)
   const r = await findOne(TODO_COLLECTION_NAME, { userId: userId }, { _id: 1 })
+  blue('userExists: r', r)
   return !ramdaIsEmpty(r)
 }
 
@@ -24,13 +31,10 @@ const validation = async (req, res, next) => {
   const errors = []
 
   const method = req.method
-  // blue('method', method)
 
   const { body, params } = req
-  blue('body', body)
 
   const { userid, todoid } = params
-  blue('params', params)
 
   const {
     _id,
@@ -42,25 +46,23 @@ const validation = async (req, res, next) => {
     userId
   } = body
 
-  // params ---
+  // All requests must have a userid in params so check this first
   if (!isUUID(toString(userid), 4)) {
+    blue('userid', userid)
     errors.push(
       createError('params', '001: param userid is not valid', 'userid')
     )
   }
 
-  // only PATCH has 
+  // For PATCH and POST 'userId' in body must match 'userid' in params
   if (method === 'PATCH' || method === 'POST') {
-    // blue('userId', userId)
-    // blue('userid', userid)
     if (userId !== userid) {
       errors.push(createError('', '0012: unmatched user iDs', ''))
     }
   }
   
-  // blue('userid', typeof userid)
   const exists = await userExists(userid)
-  // blue('exists', exists)
+  blue('exists', exists)  
   if (!exists) {
     errors.push(createError('params', '011: unknown user', 'userid'))
   }
@@ -116,9 +118,7 @@ const validation = async (req, res, next) => {
 
   if (method === 'POST' || method === 'PATCH') {
     // due date is not required
-    // blue('isEmpty', isEmpty(toString(dueDate)))
     if (!isEmpty(toString(dueDate))) {
-      // blue('** it is not empty')
       if (!isISO8601(toString(dueDate)))
         errors.push(
           createError(

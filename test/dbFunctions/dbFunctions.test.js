@@ -21,7 +21,7 @@ chai.use(chaiAsPromised)
 const collectionName = 'todos'
 
 const cfg = config()
-const auth0UUID = cfg.testUser.auth0UUID
+const testUserUUID = cfg.testUser.uuid
 
 after(async () => {
   await close()
@@ -137,14 +137,14 @@ describe('dbFunctions success cases', function() {
       await insertMany(collectionName, fourTodos)
     })
     it('findOne valid userId: should return one document with _id', async function() {
-      const r = await findOne(collectionName, { userId: auth0UUID }, { _id: 1 })
+      const r = await findOne(collectionName, { userId: testUserUUID }, { _id: 1 })
       const _idNil = isNil(r)
       expect(_idNil).to.equal(false)
     })
     it('findOne invalid userId: empty object', async function() {
       const r = await findOne(
         collectionName,
-        { userId: 'auth0UUID' },
+        { userId: 'invalId' },
         { _id: 1 }
       )
       // yellow('r', isNil(r))
