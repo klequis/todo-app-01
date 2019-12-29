@@ -12,6 +12,7 @@ import { green, red } from 'logger'
  */
 
 const todoPatch = wrap(async (req, res) => {
+  red('_id in todo MUST = userid in params')
 
   const { body, params } = req
   const { userid } = params
@@ -20,11 +21,9 @@ const todoPatch = wrap(async (req, res) => {
   const t1 = pick([
     'completed',
     'dueDate',
+    'lastUpdatedAt',
     'title',
   ], body)
-
-  green('t1', t1)
-
   const t2 = mergeRight(t1, { lastUpdatedAt: new Date().toISOString() })
 
   const r = await findOneAndUpdate(TODO_COLLECTION_NAME, { _id, userId: userid }, t2)
