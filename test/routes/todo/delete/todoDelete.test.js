@@ -11,10 +11,10 @@ const invalidMongoId = '5d0147d82bdf2864' // this id is truncated
 const idNotFound = '5cfbe5bf4bc4b4f726a14852' // this is a valid id but not in the db
 
 const cfg = config()
-const auth0UUID = cfg.testUser.auth0UUID
+const testUserUUID = cfg.testUser.uuid
 
 const deleteUri = todoid => {
-  const uri = `/api/todo/${auth0UUID}/${todoid}`
+  const uri = `/api/todo/${testUserUUID}/${todoid}`
   return uri
 }
 

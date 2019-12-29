@@ -7,7 +7,9 @@ import { TODO_COLLECTION_NAME } from 'db/constants'
 import config from 'config'
 
 const cfg = config()
-const auth0UUID = cfg.testUser.auth0UUID
+// TODO: should this be using 'user_id' and not 'uuid'
+// const auth0UUID = cfg.testUser.auth0UUID
+const testUserUUID = cfg.testUser.uuid
 
 describe('test getToken()', function() {
   let token
@@ -30,7 +32,7 @@ describe('test getToken()', function() {
   it('should return 4 todos', async function() {
     const r = await sendRequest({
       method: 'GET',
-      uri: `/api/todo/${auth0UUID}`,
+      uri: `/api/todo/${testUserUUID}`,
       status: 200,
       token
     })

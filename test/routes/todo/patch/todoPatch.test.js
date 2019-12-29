@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { auth0UUID } from './fixture'
+import { testUserUUID } from './fixture'
 import { fourTodos } from 'test/fourTodos'
 import { dropCollection, insertMany } from 'db'
 import getToken from 'test/getToken'
@@ -11,7 +11,7 @@ import { addDays, differenceInDays } from 'date-fns'
 import { redf } from 'logger'
 
 function patchUri(id) {
-  return `/api/todo/${auth0UUID}/${id}`
+  return `/api/todo/${testUserUUID}/${id}`
 }
 
 describe('todoRoute PATCH', function() {

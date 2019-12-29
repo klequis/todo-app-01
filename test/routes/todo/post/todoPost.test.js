@@ -8,9 +8,9 @@ import config from 'config'
 import { addDays } from 'date-fns'
 
 const cfg = config()
-const auth0UUID = cfg.testUser.auth0UUID
+const testUserUUID = cfg.testUser.uuid
 
-const postUri = `/api/todo/${auth0UUID}`
+const postUri = `/api/todo/${testUserUUID}`
 
 function diffDateTime(date1, date2) {
   let d1
@@ -42,7 +42,7 @@ describe('todoRoute POST', function() {
       const todoSent = {
         dueDate: addDays(new Date(), 1).toISOString(),
         title: 'post: new todo with due date',
-        userId: auth0UUID
+        userId: testUserUUID
       }
       const r = await sendRequest({
         method: 'POST',
@@ -61,13 +61,13 @@ describe('todoRoute POST', function() {
       const diffLastUpdated = diffDateTime(todo.lastUpdatedAt, new Date())
       expect(Math.abs(diffLastUpdated)).to.be.lessThan(400)
       expect(todo.title).to.equal(todoSent.title)
-      expect(todo.userId).to.equal(auth0UUID)
+      expect(todo.userId).to.equal(testUserUUID)
     })
 
     it('new todo without dueDate', async function() {
       const todoSent = {
         title: 'post: new todo w/o dueDate',
-        userId: auth0UUID
+        userId: testUserUUID
       }
       const r = await sendRequest({
         method: 'POST',
@@ -86,7 +86,7 @@ describe('todoRoute POST', function() {
       const diffLastUpdated = diffDateTime(todo.lastUpdatedAt, new Date())
       expect(Math.abs(diffLastUpdated)).to.be.lessThan(400)
       expect(todo.title).to.equal(todoSent.title)
-      expect(todo.userId).to.equal(auth0UUID)
+      expect(todo.userId).to.equal(testUserUUID)
     })
   })
   describe('invalid tests - should return validation errors[]', function() {
@@ -131,7 +131,7 @@ describe('todoRoute POST', function() {
     it('title too short', async function() {
       const todoSent = {
         title: 'aa',
-        userId: auth0UUID
+        userId: testUserUUID
       }
       const r = await sendRequest({
         method: 'POST',
