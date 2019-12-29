@@ -3,29 +3,29 @@ import { yellow } from 'logger'
 
 const cfg = config()
 
-const auth0Id = cfg.testUser.auth0Id
+const testUserUUID = cfg.testUser.uuid
 
 
 export const fourTodos = [
   {
     completed: false,
-    userId: auth0Id,
+    userId: testUserUUID,
     title: 'first todo'
   },
   {
     title: 'second todo',
     completed: false,
-    userId: auth0Id
+    userId: testUserUUID
   },
   {
     title: 'third todo',
     completed: false,
-    userId: auth0Id
+    userId: testUserUUID
   },
   {
     title: 'fourth todo',
     completed: false,
-    userId: auth0Id
+    userId: testUserUUID
   }
 ]
 
@@ -34,7 +34,7 @@ export const fourTodosForPost = [
     completed: false,
     createdAt: '2019-08-12T17:01:16.927Z',
     lastUpdatedAt: '2019-08-12T17:01:16.927Z',
-    userId: auth0Id,
+    userId: testUserUUID,
     title: 'first todo'
   },
   {
@@ -42,28 +42,28 @@ export const fourTodosForPost = [
     createdAt: '2019-08-12T17:01:16.927Z',
     lastUpdatedAt: '2019-08-12T17:01:16.927Z',
     title: 'second todo',
-    userId: auth0Id
+    userId: testUserUUID
   },
   {
     completed: false,
     createdAt: '2019-08-12T17:01:16.927Z',
     lastUpdatedAt: '2019-08-12T17:01:16.927Z',
     title: 'third todo',
-    userId: auth0Id
+    userId: testUserUUID
   },
   {
     completed: false,
     createdAt: '2019-08-12T17:01:16.927Z',
     lastUpdatedAt: '2019-08-12T17:01:16.927Z',
     title: 'fourth todo',
-    userId: auth0Id
+    userId: testUserUUID
   }
 ]
 
 // minium fields for post
 export const todoMinimumFieldsForPost = {
   title: 'a good todo',
-  userId: auth0Id
+  userId: testUserUUID
 }
 // missing userId
 export const todoMissingUserId = {
@@ -82,15 +82,15 @@ export const todoJunkUserId = {
 }
 
 export const todoMissingTitle = {
-  userId: auth0Id
+  userId: testUserUUID
 }
 // title too short
 export const todoTitleTooShort = {
-  userId: auth0Id,
+  userId: testUserUUID,
   title: 'ab'
 }
 // empty title
 export const todoEmptyTitle = {
-  userId: auth0Id,
+  userId: testUserUUID,
   title: ''
 }
