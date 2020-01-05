@@ -33,7 +33,8 @@ const validation = async (req, res, next) => {
   const method = req.method
 
   const { body, params } = req
-
+  blue('validation: body', body)
+  blue('validation: params', params)
   const { userid, todoid } = params
 
   const {
